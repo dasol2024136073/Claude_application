@@ -32,9 +32,7 @@ jobs:
         run: |
           mkdir -p dist
           marp midterm-presentation.md --html --output dist/index.html
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+          touch dist/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
