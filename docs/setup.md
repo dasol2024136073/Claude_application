@@ -74,7 +74,7 @@ flutter devices
 flutter run
 ```
 
-"AI 여행 경로 추천" 타이틀과 시작하기 버튼이 보이면 성공입니다.
+Google / Kakao 소셜 로그인 버튼이 있는 화면이 보이면 성공입니다.
 
 ### 특정 디바이스 지정
 
