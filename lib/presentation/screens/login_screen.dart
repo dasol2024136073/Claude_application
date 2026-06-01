@@ -57,7 +57,7 @@ class _HeroArea extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '취향에 맞는 여행 동선을\nAI가 10초 만에 설계합니다',
+            '당신의 발걸음을 AI가 별자리처럼 이어\n이 세상 어디에도 없던 하나뿐인 여행',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
