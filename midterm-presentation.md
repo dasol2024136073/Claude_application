@@ -20,7 +20,7 @@ style: |
   li { margin-bottom: 6px; line-height: 1.6; }
   table { width: 100%; border-collapse: collapse; font-size: 0.82em; }
   th { background: #1e3a8a; color: #ffffff; padding: 10px 16px; text-align: left; }
-  td { padding: 9px 16px; border-bottom: 1px solid #e2e8f0; }
+  td { padding: 9px 16px; border-bottom: 1px solid #e2e8f0; color: #1e3a8a; }
   tr:nth-child(even) td { background: #f8fafc; }
   blockquote {
     border-left: 4px solid #3b82f6;
