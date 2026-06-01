@@ -40,6 +40,9 @@ style: |
   section.qa h2 { color: #ffffff; border-color: #60a5fa; }
   section.qa li { color: #e2e8f0; }
   section.qa strong { color: #93c5fd; }
+  section.qa th { background: rgba(255,255,255,0.18); color: #ffffff; }
+  section.qa td { color: #e2e8f0; border-bottom-color: rgba(255,255,255,0.15); }
+  section.qa tr:nth-child(even) td { background: rgba(255,255,255,0.08); }
   section.end { background: #0f172a; color: #ffffff; justify-content: center; text-align: center; }
   section.end h2 { border: none; color: #60a5fa; }
 ---
