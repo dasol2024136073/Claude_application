@@ -96,12 +96,25 @@ style: |
 
 ## 기술 스택 — 왜 이걸 선택했나요?
 
-| 영역 | 선택 | 핵심 이유 | 검토 후 제외한 대안 |
+**앱 프레임워크 비교 — Flutter vs 대안**
+
+| 항목 | ✅ Flutter (선택) | React Native | 네이티브 Swift/Kotlin |
 |---|---|---|---|
-| 앱 프레임워크 | **Flutter** | iOS/Android 단일 코드, Maps·Firebase 공식 SDK | React Native(JS 미숙), 네이티브(코드 2배) |
+| 코드베이스 | **단일 코드 → iOS·Android 동시 빌드** | 단일 코드, JS 브리지 성능 손실 | 플랫폼별 별도 코드 (공수 2배) |
+| UI 렌더링 | **자체 엔진 — OS 무관 픽셀 일치** | 네이티브 위젯 위임 → OS별 차이 | 완전 네이티브 |
+| 지도·Firebase | **공식 SDK 안정 제공** | 공식 SDK 있으나 안정성 낮음 | 공식 SDK 있음 |
+| 개발 속도 | **Hot Reload — 빠른 프로토타입** | 비슷 | 느림 (컴파일 사이클) |
+| **결론** | **MVP를 혼자·빠르게·두 플랫폼에** | JS 미숙 + 브리지 오버헤드 | 개발 공수 감당 불가 |
+
+<br>
+
+**나머지 스택 선택 근거**
+
+| 영역 | 선택 | 이유 | 제외한 대안 |
+|---|---|---|---|
 | 상태관리 | **Riverpod 2.x** | AsyncValue로 로딩·오류·데이터 타입 안전 처리 | BLoC(보일러플레이트 과다), GetX(테스트 어려움) |
 | 백엔드 | **Firebase** | Auth·Firestore 즉시 사용, 무료 플랜 MVP 가능 | Supabase(SDK 성숙도), 직접 구축(배포 부담) |
-| AI 엔진 | **Claude API** | 자연어 프롬프트 → 구조화된 JSON 일정 생성 | GPT-4o 검토, 수업 취지상 Claude 선택 |
+| AI 엔진 | **Claude API** | 자연어 → 구조화된 JSON 일정 생성 | GPT-4o 검토, 수업 취지상 Claude 선택 |
 | 네비게이션 | **GoRouter** | 선언형 URL 라우팅, 딥링크·웹 지원 | — |
 | 날씨 | **OpenWeatherMap** | 무료 API, 실시간 기온·강수 | — |
 

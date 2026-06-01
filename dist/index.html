@@ -401,22 +401,61 @@ section.end { background: #0f172a; color: #ffffff; justify-content: center; text
 section.end h2 { border: none; color: #60a5fa; }
 ;" data-marpit-pagination-total="10" data-size="16:9">
 <h2 id="%EA%B8%B0%EC%88%A0-%EC%8A%A4%ED%83%9D--%EC%99%9C-%EC%9D%B4%EA%B1%B8-%EC%84%A0%ED%83%9D%ED%96%88%EB%82%98%EC%9A%94">기술 스택 — 왜 이걸 선택했나요?</h2>
+<p><strong>앱 프레임워크 비교 — Flutter vs 대안</strong></p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> Flutter (선택)</th>
+<th>React Native</th>
+<th>네이티브 Swift/Kotlin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>코드베이스</td>
+<td><strong>단일 코드 → iOS·Android 동시 빌드</strong></td>
+<td>단일 코드, JS 브리지 성능 손실</td>
+<td>플랫폼별 별도 코드 (공수 2배)</td>
+</tr>
+<tr>
+<td>UI 렌더링</td>
+<td><strong>자체 엔진 — OS 무관 픽셀 일치</strong></td>
+<td>네이티브 위젯 위임 → OS별 차이</td>
+<td>완전 네이티브</td>
+</tr>
+<tr>
+<td>지도·Firebase</td>
+<td><strong>공식 SDK 안정 제공</strong></td>
+<td>공식 SDK 있으나 안정성 낮음</td>
+<td>공식 SDK 있음</td>
+</tr>
+<tr>
+<td>개발 속도</td>
+<td><strong>Hot Reload — 빠른 프로토타입</strong></td>
+<td>비슷</td>
+<td>느림 (컴파일 사이클)</td>
+</tr>
+<tr>
+<td><strong>결론</strong></td>
+<td><strong>MVP를 혼자·빠르게·두 플랫폼에</strong></td>
+<td>JS 미숙 + 브리지 오버헤드</td>
+<td>개발 공수 감당 불가</td>
+</tr>
+</tbody>
+</table>
+<br />
+<p><strong>나머지 스택 선택 근거</strong></p>
 <table>
 <thead>
 <tr>
 <th>영역</th>
 <th>선택</th>
-<th>핵심 이유</th>
-<th>검토 후 제외한 대안</th>
+<th>이유</th>
+<th>제외한 대안</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>앱 프레임워크</td>
-<td><strong>Flutter</strong></td>
-<td>iOS/Android 단일 코드, Maps·Firebase 공식 SDK</td>
-<td>React Native(JS 미숙), 네이티브(코드 2배)</td>
-</tr>
 <tr>
 <td>상태관리</td>
 <td><strong>Riverpod 2.x</strong></td>
@@ -432,7 +471,7 @@ section.end h2 { border: none; color: #60a5fa; }
 <tr>
 <td>AI 엔진</td>
 <td><strong>Claude API</strong></td>
-<td>자연어 프롬프트 → 구조화된 JSON 일정 생성</td>
+<td>자연어 → 구조화된 JSON 일정 생성</td>
 <td>GPT-4o 검토, 수업 취지상 Claude 선택</td>
 </tr>
 <tr>
