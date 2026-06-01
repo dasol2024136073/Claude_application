@@ -124,23 +124,21 @@ style: |
 
 ## 아키텍처 — 4계층 레이어드 구조
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Presentation  │  Application  │    Domain    │    Data      │
-│  (Flutter UI)  │  (Use Cases)  │   (Models)   │  (API · DB)  │
-└────────┬───────┴───────┬───────┴──────┬───────┴──────┬───────┘
-         ↓ 의존           ↓ 의존          ↓ 의존          ↑ 구현
-```
+**[ 화면·UI ] → [ 비즈니스 로직 ] → [ 도메인 모델 ] ← [ 데이터·API ]**
 
-| 레이어 | 현재 구현된 내용 | 다음 단계 |
+<br>
+
+| 레이어 | 한 줄 역할 | 현재 구현 |
 |---|---|---|
-| **Presentation** | LoginScreen · OnboardingScreen · HomeScreen · RouteInputScreen · RouteResultScreen | 지도 화면 추가 |
-| **Application** | — | GenerateRoute · SaveRoute UseCase |
-| **Domain** | TripPlan · DayPlan · PlaceItem 모델, IRouteRepository 인터페이스 | 유지 |
-| **Data** | MockTripData (더미) | Firebase Firestore · Claude API 클라이언트 연동 |
+| **Presentation** | 사용자가 보고 탭하는 화면 | 로그인 · 취향설정 · 홈 · 경로입력 · 결과 (5개) |
+| **Application** | 기능 흐름 조율 ("무엇을 어떤 순서로") | 미구현 → 다음 단계 |
+| **Domain** | 앱의 핵심 데이터 구조와 규칙 | TripPlan · DayPlan · PlaceItem |
+| **Data** | 외부 API·DB와 실제 통신 | Mock 더미 → Claude API · Firebase 예정 |
 
-> **설계 원칙** — Presentation은 Domain만 알고 Data를 직접 참조하지 않습니다.  
-> 백엔드를 교체해도 화면 코드는 그대로입니다.
+<br>
+
+> **핵심 원칙** — 화면은 데이터 출처를 모릅니다.  
+> Firebase를 다른 백엔드로 바꿔도 화면 코드는 그대로입니다.
 
 ---
 

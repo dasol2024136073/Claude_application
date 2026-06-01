@@ -87,8 +87,8 @@ section.end h2 { border: none; color: #60a5fa; }
 ;" data-marpit-pagination-total="10" data-size="16:9">
 <h1 id="ai-%EC%97%AC%ED%96%89-%EA%B2%BD%EB%A1%9C-%EC%B6%94%EC%B2%9C-%EC%95%B1">AI 여행 경로 추천 앱</h1>
 <br />
-<p>취향 프로필과 실시간 날씨·위치를 반영해<br />
-<strong>AI가 10초 만에 나만의 여행 동선을 설계합니다</strong></p>
+<p>나의 취향 프로필과 실시간 날씨·위치를 반영해<br />
+<strong>AI가 10초 만에 나만의 특별한 여행 동선을 설계합니다</strong></p>
 <br />
 <p><strong>임다솔</strong> · Flutter · 2026년 중간 발표</p>
 </section>
@@ -570,46 +570,43 @@ section.end { background: #0f172a; color: #ffffff; justify-content: center; text
 section.end h2 { border: none; color: #60a5fa; }
 ;" data-marpit-pagination-total="10" data-size="16:9">
 <h2 id="%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98--4%EA%B3%84%EC%B8%B5-%EB%A0%88%EC%9D%B4%EC%96%B4%EB%93%9C-%EA%B5%AC%EC%A1%B0">아키텍처 — 4계층 레이어드 구조</h2>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code>┌─────────────────────────────────────────────────────────────┐
-│  Presentation  │  Application  │    Domain    │    Data      │
-│  (Flutter UI)  │  (Use Cases)  │   (Models)   │  (API · DB)  │
-└────────┬───────┴───────┬───────┴──────┬───────┴──────┬───────┘
-         ↓ 의존           ↓ 의존          ↓ 의존          ↑ 구현
-</code></pre>
+<p><strong>[ 화면·UI ] → [ 비즈니스 로직 ] → [ 도메인 모델 ] ← [ 데이터·API ]</strong></p>
+<br />
 <table>
 <thead>
 <tr>
 <th>레이어</th>
-<th>현재 구현된 내용</th>
-<th>다음 단계</th>
+<th>한 줄 역할</th>
+<th>현재 구현</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Presentation</strong></td>
-<td>LoginScreen · OnboardingScreen · HomeScreen · RouteInputScreen · RouteResultScreen</td>
-<td>지도 화면 추가</td>
+<td>사용자가 보고 탭하는 화면</td>
+<td>로그인 · 취향설정 · 홈 · 경로입력 · 결과 (5개)</td>
 </tr>
 <tr>
 <td><strong>Application</strong></td>
-<td>—</td>
-<td>GenerateRoute · SaveRoute UseCase</td>
+<td>기능 흐름 조율 (&quot;무엇을 어떤 순서로&quot;)</td>
+<td>미구현 → 다음 단계</td>
 </tr>
 <tr>
 <td><strong>Domain</strong></td>
-<td>TripPlan · DayPlan · PlaceItem 모델, IRouteRepository 인터페이스</td>
-<td>유지</td>
+<td>앱의 핵심 데이터 구조와 규칙</td>
+<td>TripPlan · DayPlan · PlaceItem</td>
 </tr>
 <tr>
 <td><strong>Data</strong></td>
-<td>MockTripData (더미)</td>
-<td>Firebase Firestore · Claude API 클라이언트 연동</td>
+<td>외부 API·DB와 실제 통신</td>
+<td>Mock 더미 → Claude API · Firebase 예정</td>
 </tr>
 </tbody>
 </table>
+<br />
 <blockquote>
-<p><strong>설계 원칙</strong> — Presentation은 Domain만 알고 Data를 직접 참조하지 않습니다.<br />
-백엔드를 교체해도 화면 코드는 그대로입니다.</p>
+<p><strong>핵심 원칙</strong> — 화면은 데이터 출처를 모릅니다.<br />
+Firebase를 다른 백엔드로 바꿔도 화면 코드는 그대로입니다.</p>
 </blockquote>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-theme="default" data-style="section {
