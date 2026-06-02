@@ -10,7 +10,7 @@ class GeminiService {
   ));
 
   static Future<TripPlan> generateTripPlan(String destination, int days) async {
-    const model = 'gemini-1.5-flash';
+    const model = 'gemini-2.5-flash';
     final url =
         'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$geminiApiKey';
 
@@ -57,6 +57,7 @@ class GeminiService {
       'generationConfig': {
         'temperature': 0.7,
         'maxOutputTokens': 2048,
+        'thinkingConfig': {'thinkingBudget': 0},
       },
     });
 
