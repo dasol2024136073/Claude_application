@@ -6,8 +6,14 @@ import '../../domain/models/trip_plan.dart';
 class RouteResultScreen extends StatefulWidget {
   final String destination;
   final int days;
+  final TripPlan? tripPlan;
 
-  const RouteResultScreen({super.key, required this.destination, required this.days});
+  const RouteResultScreen({
+    super.key,
+    required this.destination,
+    required this.days,
+    this.tripPlan,
+  });
 
   @override
   State<RouteResultScreen> createState() => _RouteResultScreenState();
@@ -44,7 +50,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final plan = MockTripData.generate(widget.destination, widget.days);
+    final plan = widget.tripPlan ?? MockTripData.generate(widget.destination, widget.days);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),

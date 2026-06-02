@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../data/mock/mock_trip_data.dart';
+import '../../data/services/gemini_service.dart';
 
 class RouteInputScreen extends StatefulWidget {
   const RouteInputScreen({super.key});
@@ -16,18 +18,23 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
   static const _quickDestinations = ['오사카', '도쿄', '제주도', '파리', '방콕', '다낭'];
 
   Future<void> _generate() async {
-    if (_controller.text.trim().isEmpty) {
+    final destination = _controller.text.trim();
+    if (destination.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('여행지를 입력해주세요'), behavior: SnackBarBehavior.floating),
       );
       return;
     }
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
+
+    final plan = await GeminiService.generateTripPlan(destination, _days)
+        .catchError((_) => MockTripData.generate(destination, _days));
+
     if (!mounted) return;
     context.push('/route/result', extra: {
-      'destination': _controller.text.trim(),
+      'destination': destination,
       'days': _days,
+      'tripPlan': plan,
     });
     setState(() => _isLoading = false);
   }

@@ -110,6 +110,9 @@ coverage/
 # Symbols
 app.*.symbols
 
+# API 키 파일 (절대 커밋 금지)
+lib/core/config.dart
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
