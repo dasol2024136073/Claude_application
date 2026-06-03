@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/mock/mock_trip_data.dart';
+import '../../data/services/trip_repository.dart';
 import '../../domain/models/trip_plan.dart';
 
 class RouteResultScreen extends StatefulWidget {
@@ -21,6 +22,7 @@ class RouteResultScreen extends StatefulWidget {
 
 class _RouteResultScreenState extends State<RouteResultScreen> {
   bool _saved = false;
+  bool _saving = false;
 
   static const _categoryColors = {
     '관광': Color(0xFF4A90D9),
@@ -46,6 +48,35 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       if (category.contains(entry.key)) return entry.value;
     }
     return const Color(0xFF64748B);
+  }
+
+  Future<void> _savePlan(TripPlan plan) async {
+    setState(() => _saving = true);
+    try {
+      await TripRepository.save(plan);
+      if (!mounted) return;
+      setState(() {
+        _saved = true;
+        _saving = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('경로가 저장되었습니다'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('저장에 실패했습니다. 다시 시도해주세요'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -88,16 +119,8 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
           ),
           _SaveBar(
             saved: _saved,
-            onSave: () {
-              setState(() => _saved = true);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('경로가 저장되었습니다'),
-                  behavior: SnackBarBehavior.floating,
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
+            saving: _saving,
+            onSave: () => _savePlan(plan),
           ),
         ],
       ),
@@ -289,9 +312,10 @@ class _PlaceRow extends StatelessWidget {
 
 class _SaveBar extends StatelessWidget {
   final bool saved;
+  final bool saving;
   final VoidCallback onSave;
 
-  const _SaveBar({required this.saved, required this.onSave});
+  const _SaveBar({required this.saved, required this.saving, required this.onSave});
 
   @override
   Widget build(BuildContext context) {
@@ -311,10 +335,16 @@ class _SaveBar extends StatelessWidget {
         width: double.infinity,
         height: 52,
         child: FilledButton.icon(
-          onPressed: saved ? null : onSave,
-          icon: Icon(saved ? Icons.check_circle : Icons.bookmark_add_outlined),
+          onPressed: (saved || saving) ? null : onSave,
+          icon: saving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                )
+              : Icon(saved ? Icons.check_circle : Icons.bookmark_add_outlined),
           label: Text(
-            saved ? '저장 완료' : '내 경로로 저장',
+            saved ? '저장 완료' : (saving ? '저장 중...' : '내 경로로 저장'),
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           style: FilledButton.styleFrom(

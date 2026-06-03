@@ -17,7 +17,7 @@ class GeminiService {
     final prompt = '''
 여행 경로를 JSON으로 생성해줘.
 여행지: $destination
-기간: ${days}박 ${days + 1}일
+기간: ${days.toString()}박 ${(days + 1).toString()}일
 
 반드시 아래 JSON 형식으로만 응답해. 마크다운, 설명 텍스트 없이 JSON만:
 {
