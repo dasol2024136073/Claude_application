@@ -48,19 +48,27 @@ class PlaceItem {
   final String name;
   final String category;
   final String description;
+  final double? latitude;
+  final double? longitude;
 
   const PlaceItem({
     required this.time,
     required this.name,
     required this.category,
     required this.description,
+    this.latitude,
+    this.longitude,
   });
+
+  bool get hasCoordinates => latitude != null && longitude != null;
 
   Map<String, dynamic> toJson() => {
         'time': time,
         'name': name,
         'category': category,
         'description': description,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
       };
 
   factory PlaceItem.fromJson(Map<String, dynamic> json) => PlaceItem(
@@ -68,5 +76,7 @@ class PlaceItem {
         name: json['name'] as String,
         category: json['category'] as String,
         description: json['description'] as String,
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
       );
 }

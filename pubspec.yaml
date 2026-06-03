@@ -41,6 +41,10 @@ dependencies:
   # HTTP 클라이언트
   dio: ^5.8.0+1
 
+  # 지도
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
   # 로컬 저장
   shared_preferences: ^2.5.3
 

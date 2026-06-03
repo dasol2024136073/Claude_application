@@ -7,6 +7,7 @@ import 'presentation/screens/home_screen.dart';
 import 'presentation/screens/route_input_screen.dart';
 import 'domain/models/trip_plan.dart';
 import 'presentation/screens/route_result_screen.dart';
+import 'presentation/screens/map_screen.dart';
 import 'presentation/theme/app_theme.dart';
 
 final _router = GoRouter(
@@ -26,6 +27,13 @@ final _router = GoRouter(
           days: extra['days'] as int,
           tripPlan: extra['tripPlan'] as TripPlan?,
         );
+      },
+    ),
+    GoRoute(
+      path: '/route/map',
+      builder: (context, state) {
+        final plan = state.extra as TripPlan;
+        return MapScreen(tripPlan: plan);
       },
     ),
   ],

@@ -30,6 +30,8 @@ class GeminiService {
         {
           "time": "09:00",
           "name": "장소명",
+          "latitude": 35.6895,
+          "longitude": 139.6917,
           "category": "카테고리",
           "description": "한 문장 설명"
         }
@@ -44,6 +46,7 @@ class GeminiService {
 - category는 관광/맛집/쇼핑/자연/역사·문화/전망대/카페/시장 중 하나
 - description은 한국어, 50자 이내
 - 실제 존재하는 유명한 장소만
+- latitude/longitude는 해당 장소의 실제 위경도 (소수점 4자리)
 ''';
 
     final response = await _dio.post(url, data: {
@@ -85,6 +88,8 @@ class GeminiService {
             name: p['name'] as String,
             category: p['category'] as String,
             description: p['description'] as String,
+            latitude: (p['latitude'] as num?)?.toDouble(),
+            longitude: (p['longitude'] as num?)?.toDouble(),
           )).toList();
       return DayPlan(day: d['day'] as int, places: places);
     }).toList();

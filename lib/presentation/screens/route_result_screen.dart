@@ -97,6 +97,11 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.map_outlined),
+            tooltip: '지도로 보기',
+            onPressed: () => context.push('/route/map', extra: plan),
+          ),
+          IconButton(
             icon: const Icon(Icons.share_outlined),
             onPressed: () {},
           ),
