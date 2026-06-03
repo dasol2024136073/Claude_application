@@ -1,4 +1,4 @@
-# LLM Wiki — 14주차 암묵지 정리
+# LLM Wiki — 13주차 암묵지 정리
 
 > 날짜: 2026-06-03
 > 도구: Claude Code (claude-sonnet-4-6)
