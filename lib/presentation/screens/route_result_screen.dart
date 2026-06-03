@@ -56,7 +56,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   Future<void> _savePlan(TripPlan plan) async {
     setState(() => _saving = true);
     try {
-      await TripRepository.save(plan);
+      await TripRepository.save(plan, weatherCondition: widget.weather?.condition);
       if (!mounted) return;
       setState(() {
         _saved = true;

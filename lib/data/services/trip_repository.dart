@@ -6,21 +6,32 @@ class SavedTrip {
   final String id;
   final DateTime savedAt;
   final TripPlan plan;
+  final String? savedWeatherCondition; // 저장 당시 날씨 (Clear, Rain 등)
 
-  SavedTrip({required this.id, required this.savedAt, required this.plan});
+  SavedTrip({
+    required this.id,
+    required this.savedAt,
+    required this.plan,
+    this.savedWeatherCondition,
+  });
 }
 
 class TripRepository {
   static const _key = 'saved_trips';
 
-  static Future<String> save(TripPlan plan) async {
+  static Future<String> save(TripPlan plan, {String? weatherCondition}) async {
     final prefs = await SharedPreferences.getInstance();
     final existing = await getAll();
     final id = DateTime.now().millisecondsSinceEpoch.toString();
 
     final allJson = [
       ...existing.map((t) => _toJson(t)),
-      {'id': id, 'savedAt': DateTime.now().toIso8601String(), 'plan': plan.toJson()},
+      {
+        'id': id,
+        'savedAt': DateTime.now().toIso8601String(),
+        'plan': plan.toJson(),
+        'savedWeatherCondition': weatherCondition,
+      },
     ];
     await prefs.setString(_key, jsonEncode(allJson));
     return id;
@@ -37,6 +48,7 @@ class TripRepository {
               id: e['id'] as String,
               savedAt: DateTime.parse(e['savedAt'] as String),
               plan: TripPlan.fromJson(e['plan'] as Map<String, dynamic>),
+              savedWeatherCondition: e['savedWeatherCondition'] as String?,
             ))
         .toList();
     trips.sort((a, b) => b.savedAt.compareTo(a.savedAt));
@@ -53,5 +65,7 @@ class TripRepository {
         'id': t.id,
         'savedAt': t.savedAt.toIso8601String(),
         'plan': t.plan.toJson(),
+        if (t.savedWeatherCondition != null)
+          'savedWeatherCondition': t.savedWeatherCondition,
       };
 }
