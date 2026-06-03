@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/mock/mock_trip_data.dart';
 import '../../data/services/trip_repository.dart';
+import '../../data/services/weather_service.dart';
 import '../../domain/models/trip_plan.dart';
 
 class RouteResultScreen extends StatefulWidget {
   final String destination;
   final int days;
   final TripPlan? tripPlan;
+  final WeatherInfo? weather;
 
   const RouteResultScreen({
     super.key,
     required this.destination,
     required this.days,
     this.tripPlan,
+    this.weather,
   });
 
   @override
@@ -109,7 +112,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       ),
       body: Column(
         children: [
-          _AiBadgeBar(),
+          _AiBadgeBar(weather: widget.weather),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(20),
@@ -134,6 +137,9 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
 }
 
 class _AiBadgeBar extends StatelessWidget {
+  final WeatherInfo? weather;
+  const _AiBadgeBar({this.weather});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -150,10 +156,24 @@ class _AiBadgeBar extends StatelessWidget {
             ),
             child: const Text('AI 생성', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
+          if (weather != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF22C55E),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${weather!.emoji} ${weather!.summary}',
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
           Expanded(
             child: Text(
-              'Claude API 기반 취향 맞춤 경로 • 실시간 날씨 반영',
+              weather != null ? '실시간 날씨 반영 경로' : 'AI 취향 맞춤 경로',
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               overflow: TextOverflow.ellipsis,
             ),

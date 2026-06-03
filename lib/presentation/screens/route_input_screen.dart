@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/mock/mock_trip_data.dart';
 import '../../data/services/gemini_service.dart';
+import '../../data/services/weather_service.dart';
 
 class RouteInputScreen extends StatefulWidget {
   const RouteInputScreen({super.key});
@@ -14,6 +15,8 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
   final _controller = TextEditingController();
   int _days = 3;
   bool _isLoading = false;
+  String _loadingMessage = '';
+  WeatherInfo? _weather;
 
   static const _quickDestinations = ['오사카', '도쿄', '제주도', '파리', '방콕', '다낭'];
 
@@ -25,9 +28,15 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
       );
       return;
     }
-    setState(() => _isLoading = true);
 
-    final plan = await GeminiService.generateTripPlan(destination, _days)
+    setState(() { _isLoading = true; _loadingMessage = '날씨 정보 확인 중...'; });
+
+    final weather = await WeatherService.fetch(destination);
+
+    if (!mounted) return;
+    setState(() { _weather = weather; _loadingMessage = 'AI가 경로를 설계하는 중...'; });
+
+    final plan = await GeminiService.generateTripPlan(destination, _days, weather: weather)
         .catchError((_) => MockTripData.generate(destination, _days));
 
     if (!mounted) return;
@@ -35,8 +44,9 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
       'destination': destination,
       'days': _days,
       'tripPlan': plan,
+      'weather': weather,
     });
-    setState(() => _isLoading = false);
+    setState(() { _isLoading = false; _weather = null; });
   }
 
   @override
@@ -175,7 +185,38 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
                 );
               }),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
+            if (_weather != null)
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F6FF),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFCCDEF7)),
+                ),
+                child: Row(
+                  children: [
+                    Text(_weather!.emoji, style: const TextStyle(fontSize: 22)),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '현재 날씨: ${_weather!.summary}',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
+                        ),
+                        Text(
+                          '날씨를 반영한 경로로 설계합니다',
+                          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -195,7 +236,7 @@ class _RouteInputScreenState extends State<RouteInputScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'AI가 경로를 설계하는 중...',
+                            _loadingMessage,
                             style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.9)),
                           ),
                         ],

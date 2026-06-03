@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../../core/config.dart';
 import '../../domain/models/trip_plan.dart';
+import 'weather_service.dart';
 
 class GeminiService {
   static final _dio = Dio(BaseOptions(
@@ -9,7 +10,7 @@ class GeminiService {
     receiveTimeout: const Duration(seconds: 60),
   ));
 
-  static Future<TripPlan> generateTripPlan(String destination, int days) async {
+  static Future<TripPlan> generateTripPlan(String destination, int days, {WeatherInfo? weather}) async {
     const model = 'gemini-2.5-flash';
     final url =
         'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$geminiApiKey';
@@ -47,6 +48,7 @@ class GeminiService {
 - description은 한국어, 50자 이내
 - 실제 존재하는 유명한 장소만
 - latitude/longitude는 해당 장소의 실제 위경도 (소수점 4자리)
+${weather != null ? '\n날씨 조건: ${weather.summary}\n${weather.geminiHint}' : ''}
 ''';
 
     final response = await _dio.post(url, data: {
