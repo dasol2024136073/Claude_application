@@ -205,6 +205,83 @@ remote:   path: main.dart.js:27104
 
 ---
 
+### 패턴 18: 외부 API 도시명 검색 — 언어별 변환 맵 패턴
+
+OpenWeatherMap 등 외부 날씨 API는 영어 도시명 기준으로 설계되어 있음.
+한국어 소도시(강릉, 경주, 전주 등)를 직접 입력하면 404 응답.
+
+```dart
+static const _cityMap = {
+  // 해외 (한국어→영어)
+  '도쿄': 'Tokyo', '오사카': 'Osaka', '파리': 'Paris', ...
+  // 국내 (한글→영문 로마자)
+  '서울': 'Seoul', '강릉': 'Gangneung', '경주': 'Gyeongju',
+  '전주': 'Jeonju', '속초': 'Sokcho', ...
+};
+
+// 사용: API 호출 시 변환, 화면 표시는 원래 한국어 그대로
+final apiName = _cityMap[city] ?? city;
+```
+
+**교훈**: API가 지원하는 언어와 사용자 입력 언어가 다를 때,
+변환 맵을 서비스 레이어에 두면 UI는 건드리지 않아도 됨.
+`_cityMap[city] ?? city` 패턴으로 맵에 없는 도시도 그대로 시도함.
+
+---
+
+### 패턴 19: API 전문용어 → 사용자 친화 용어 변환 레이어
+
+외부 API가 반환하는 설명이 일반 사용자에게 생소할 때
+서비스 레이어에 변환 함수를 두면 UI 코드를 수정할 필요 없음.
+
+```dart
+// OWM lang=kr 반환값: '온흐림', '실비', '박무', '튼구름' 등
+// → 사용자 친화 변환:
+static String _simplifyDesc(String desc) {
+  const map = {
+    '온흐림': '흐림', '튼구름': '흐림', '구름많음': '흐림',
+    '실비': '가랑비', '가벼운 강우': '가랑비',
+    '박무': '안개', '연무': '안개',
+    '강한 비': '폭우', '가벼운 눈': '눈', ...
+  };
+  if (map.containsKey(desc)) return map[desc]!;
+  // contains 기반 fallback
+  if (desc.contains('뇌우')) return '천둥번개';
+  if (desc.contains('눈')) return '눈';
+  return desc;
+}
+```
+
+**교훈**: API 응답을 그대로 UI에 노출하지 말고,
+도메인 모델로 변환하는 시점에 사용자 언어로 정제할 것.
+exact match → contains fallback 순서로 처리하면 누락 케이스를 줄일 수 있음.
+
+---
+
+### 패턴 20: Flutter Web API 디버깅 — 브라우저 콘솔 활용
+
+Flutter Web에서 API 호출 오류는 앱 화면에 "도시를 찾을 수 없습니다"처럼 뭉뚱그려 나옴.
+실제 오류(404, CORS, 타임아웃)를 확인하려면 브라우저 DevTools가 필수.
+
+```dart
+// 디버깅용 print 삽입 (확인 후 제거)
+// ignore: avoid_print
+print('[Weather] fetchForecastByCity: city=$city query=$query');
+// ignore: avoid_print
+print('[Weather] Geocoding result: ${geoList.length} items');
+```
+
+**디버깅 순서**:
+1. `catch (e)` 에서 `_` 대신 `e`로 받아 print
+2. 브라우저 F12 → Console 탭에서 `[Weather]` 로그 확인
+3. Network 탭에서 실제 HTTP 요청/응답 확인
+4. 원인 파악 후 print 제거, `catch (_)` 복구
+
+**교훈**: `catch (_)` 로 조용히 null을 반환하면 사용자에게 좋지만
+디버깅 중에는 반드시 에러를 로그로 남겨야 함.
+
+---
+
 ## 6. 누적 패턴 현황 (15주차 기준)
 
 | 주차 | 패턴 번호 | 주제 |
@@ -213,6 +290,6 @@ remote:   path: main.dart.js:27104
 | 11주차 | 4~7 | md 파일 분석, 현황 파악, 빌드 검증, git add 범위 |
 | 12주차 | 8~10 | 메모리 기반 재개, 도메인 모델 분리, 빌드 검증 포함 |
 | 13주차 | 11~14 | JSON 강제, 방어적 파싱, thinkingBudget, 로컬 인증 |
-| 15주차 | 15~17 | AGENTS.md 구조, Flutter web base-href, GitHub 빌드 파일 보안 |
+| 15주차 | 15~20 | AGENTS.md, base-href, 빌드 보안, 도시명 변환 맵, 전문용어 정제, Web API 디버깅 |
 
-총 **17개 패턴** 누적
+총 **20개 패턴** 누적
