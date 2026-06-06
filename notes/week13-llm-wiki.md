@@ -139,3 +139,80 @@ static Future<({bool success, String? error})> register(...) async {
 | 13주차 | 11~14 | JSON 강제, 방어적 파싱, thinkingBudget, 로컬 인증 |
 
 총 **14개 패턴** 누적 (LLM Wiki 가산점 기준 10개 초과)
+
+---
+
+## 5. 15주차 추가 패턴 (2026-06-06)
+
+### 패턴 15: AGENTS.md — AI Agent용 컨텍스트 파일 구조
+
+프로젝트에 새로운 AI Agent가 들어왔을 때 바로 작업할 수 있도록
+`AGENTS.md`에 기술 스택·명령어·디렉토리 구조·금지 사항을 한 파일에 정리.
+
+```markdown
+# AGENTS.md 필수 섹션
+1. 기술 스택 (실제 구현 기준 — 계획과 다를 수 있음)
+2. 핵심 명령어 (analyze / test / build)
+3. 디렉토리 구조 (핵심 파일 경로)
+4. 코딩 규칙 (프레임워크·모델·패턴 제약)
+5. 절대 금지 사항 (API 키 커밋 등)
+```
+
+**교훈**: "실제 구현 기준"으로 쓰는 게 핵심. README가 계획 기준이라면
+AGENTS.md는 현재 상태 기준. 두 파일의 역할이 다르다.
+
+---
+
+### 패턴 16: Flutter Web 배포 — base-href 함정
+
+GitHub Pages와 Netlify는 앱이 서빙되는 루트 경로가 다르다.
+`--base-href`를 잘못 설정하면 JS/CSS 리소스가 전부 404.
+
+```bash
+# GitHub Pages (레포명이 경로에 포함됨)
+flutter build web --base-href "/Claude_application/"
+
+# Netlify / 루트 도메인 배포
+flutter build web --base-href "/"
+```
+
+**증상**: 콘솔에 `Failed to load resource: 404`, `manifest.json 404`
+**원인**: `index.html`의 `<base href="/Claude_application/">` 때문에
+모든 리소스를 `/Claude_application/flutter_bootstrap.js`에서 찾음.
+
+**교훈**: 배포 플랫폼 바꿀 때는 base-href도 같이 확인해야 함.
+
+---
+
+### 패턴 17: GitHub Push Protection — 빌드 파일에 API 키 포함 시 차단
+
+Flutter web 빌드(`main.dart.js`)에는 `config.dart`의 API 키가
+그대로 컴파일되어 포함된다. 이 파일을 GitHub에 push하면
+GitHub Secret Scanning이 감지해서 push를 자동 차단.
+
+```
+remote: - Push cannot contain secrets
+remote:   GCP API Key Bound to a Service Account
+remote:   path: main.dart.js:27104
+```
+
+**해결책**:
+- GitHub에서 허용 URL 클릭 (데모용 키라면 허용 가능)
+- 또는 GitHub을 거치지 않는 배포 플랫폼 사용 (Netlify drag-and-drop 등)
+
+**교훈**: 빌드 결과물은 소스코드와 다르게 API 키가 평문으로 포함됨.
+`build/`를 gitignore하는 이유가 단순히 용량 문제가 아님.
+
+---
+
+## 6. 누적 패턴 현황 (15주차 기준)
+
+| 주차 | 패턴 번호 | 주제 |
+|------|-----------|------|
+| 10주차 | 1~3 | 조건 정의, 선택형 질문, 문서 참조 |
+| 11주차 | 4~7 | md 파일 분석, 현황 파악, 빌드 검증, git add 범위 |
+| 12주차 | 8~10 | 메모리 기반 재개, 도메인 모델 분리, 빌드 검증 포함 |
+| 13주차 | 11~14 | JSON 강제, 방어적 파싱, thinkingBudget, 로컬 인증 |
+| 15주차 | 15~17 | AGENTS.md 구조, Flutter web base-href, GitHub 빌드 파일 보안 |
+
+총 **17개 패턴** 누적
