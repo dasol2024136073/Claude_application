@@ -75,15 +75,160 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _pickBirthDate() async {
     final now = DateTime.now();
-    final picked = await showDatePicker(
+    int selYear = _birthDate?.year ?? 2000;
+    int selMonth = _birthDate?.month ?? 1;
+    int selDay = _birthDate?.day ?? 1;
+
+    final yearController = FixedExtentScrollController(
+        initialItem: selYear - 1924);
+    final monthController = FixedExtentScrollController(
+        initialItem: selMonth - 1);
+    final dayController = FixedExtentScrollController(
+        initialItem: selDay - 1);
+
+    await showModalBottomSheet(
       context: context,
-      initialDate: _birthDate ?? DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: now,
-      helpText: '생년월일 선택',
-      locale: const Locale('ko'),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return StatefulBuilder(builder: (ctx, setInner) {
+          int daysInMonth = DateTime(selYear, selMonth + 1, 0).day;
+
+          return SizedBox(
+            height: 320,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('취소',
+                            style: TextStyle(color: Colors.grey, fontSize: 16)),
+                      ),
+                      const Text('생년월일',
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _birthDate = DateTime(selYear, selMonth, selDay);
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('확인',
+                            style: TextStyle(
+                                color: Color(0xFF4A90D9),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: Row(
+                    children: [
+                      // 년
+                      Expanded(
+                        flex: 3,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: yearController,
+                          itemExtent: 44,
+                          perspective: 0.003,
+                          diameterRatio: 1.6,
+                          onSelectedItemChanged: (i) =>
+                              setInner(() => selYear = 1924 + i),
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: now.year - 1924 + 1,
+                            builder: (_, i) => Center(
+                              child: Text('${1924 + i}년',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: selYear == 1924 + i
+                                        ? const Color(0xFF1A1A2E)
+                                        : Colors.grey[400],
+                                    fontWeight: selYear == 1924 + i
+                                        ? FontWeight.w700
+                                        : FontWeight.normal,
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 월
+                      Expanded(
+                        flex: 2,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: monthController,
+                          itemExtent: 44,
+                          perspective: 0.003,
+                          diameterRatio: 1.6,
+                          onSelectedItemChanged: (i) {
+                            setInner(() {
+                              selMonth = i + 1;
+                              final max = DateTime(selYear, selMonth + 1, 0).day;
+                              if (selDay > max) selDay = max;
+                            });
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: 12,
+                            builder: (_, i) => Center(
+                              child: Text('${i + 1}월',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: selMonth == i + 1
+                                        ? const Color(0xFF1A1A2E)
+                                        : Colors.grey[400],
+                                    fontWeight: selMonth == i + 1
+                                        ? FontWeight.w700
+                                        : FontWeight.normal,
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // 일
+                      Expanded(
+                        flex: 2,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: dayController,
+                          itemExtent: 44,
+                          perspective: 0.003,
+                          diameterRatio: 1.6,
+                          onSelectedItemChanged: (i) =>
+                              setInner(() => selDay = i + 1),
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: daysInMonth,
+                            builder: (_, i) => Center(
+                              child: Text('${i + 1}일',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    color: selDay == i + 1
+                                        ? const Color(0xFF1A1A2E)
+                                        : Colors.grey[400],
+                                    fontWeight: selDay == i + 1
+                                        ? FontWeight.w700
+                                        : FontWeight.normal,
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      },
     );
-    if (picked != null) setState(() => _birthDate = picked);
+
+    yearController.dispose();
+    monthController.dispose();
+    dayController.dispose();
   }
 
   @override
