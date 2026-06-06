@@ -24,6 +24,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
+    final phone = _phoneController.text.trim();
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       _showError('이름, 이메일, 비밀번호는 필수입니다');
       return;
@@ -32,20 +33,34 @@ class _SignupScreenState extends State<SignupScreen> {
       _showError('비밀번호는 6자 이상이어야 합니다');
       return;
     }
+    if (phone.isEmpty) {
+      _showError('전화번호를 입력해주세요');
+      return;
+    }
+    if (_birthDate == null) {
+      _showError('생년월일을 선택해주세요');
+      return;
+    }
 
     setState(() => _isLoading = true);
     final result = await AuthService.register(
       name, email, password,
       gender: _gender,
-      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
-      birthDate: _birthDate == null ? null
-          : '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
+      phone: phone,
+      birthDate: '${_birthDate!.year}-${_birthDate!.month.toString().padLeft(2, '0')}-${_birthDate!.day.toString().padLeft(2, '0')}',
     );
     if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (result.success) {
-      context.go('/onboarding');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('회원가입이 완료됐습니다. 로그인해주세요'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Color(0xFF22C55E),
+        ),
+      );
+      context.go('/');
     } else {
       _showError(result.error ?? '회원가입 실패');
     }
@@ -115,7 +130,7 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 16),
             _buildGenderField(),
             const SizedBox(height: 16),
-            _buildField('전화번호', '010-0000-0000', _phoneController,
+            _buildField('전화번호 *', '010-0000-0000', _phoneController,
                 type: TextInputType.phone),
             const SizedBox(height: 16),
             _buildBirthDateField(),
@@ -269,7 +284,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('생년월일', style: TextStyle(fontSize: 14,
+        const Text('생년월일 *', style: TextStyle(fontSize: 14,
             fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
         const SizedBox(height: 8),
         GestureDetector(
