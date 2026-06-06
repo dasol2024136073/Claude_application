@@ -8,6 +8,7 @@ import 'presentation/screens/route_input_screen.dart';
 import 'domain/models/trip_plan.dart';
 import 'presentation/screens/route_result_screen.dart';
 import 'presentation/screens/map_screen.dart';
+import 'presentation/screens/weather_screen.dart';
 import 'data/services/weather_service.dart';
 import 'presentation/theme/app_theme.dart';
 
@@ -36,6 +37,17 @@ final _router = GoRouter(
       builder: (context, state) {
         final plan = state.extra as TripPlan;
         return MapScreen(tripPlan: plan);
+      },
+    ),
+    GoRoute(
+      path: '/weather',
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        return WeatherScreen(
+          initialLat: extra?['lat'] as double?,
+          initialLon: extra?['lon'] as double?,
+          initialCity: extra?['city'] as String? ?? '',
+        );
       },
     ),
   ],

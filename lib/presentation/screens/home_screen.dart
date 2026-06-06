@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../data/mock/mock_trip_data.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/gemini_service.dart';
 import '../../data/services/trip_repository.dart';
 import '../../data/services/weather_monitor_service.dart';
+import '../../data/services/weather_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   String _userName = '';
   bool _loading = true;
   bool _checkingWeather = false;
+  WeatherInfo? _currentWeather;
+  String _currentCity = '';
+  double? _currentLat, _currentLon;
+  bool _loadingWeather = false;
 
   @override
   void initState() {
@@ -42,6 +48,28 @@ class _HomeScreenState extends State<HomeScreen> {
       _loading = false;
     });
     _startWeatherMonitoring(trips);
+    _loadCurrentWeather();
+  }
+
+  Future<void> _loadCurrentWeather() async {
+    if (!mounted) return;
+    setState(() => _loadingWeather = true);
+    try {
+      final pos = await Geolocator.getCurrentPosition()
+          .timeout(const Duration(seconds: 10));
+      final (weather, city) =
+          await WeatherService.fetchByCoords(pos.latitude, pos.longitude);
+      if (!mounted) return;
+      setState(() {
+        _currentWeather = weather;
+        _currentCity = city;
+        _currentLat = pos.latitude;
+        _currentLon = pos.longitude;
+        _loadingWeather = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loadingWeather = false);
+    }
   }
 
   void _startWeatherMonitoring(List<SavedTrip> trips) {
@@ -172,7 +200,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _GreetingCard(name: _userName),
+                    _GreetingCard(
+                      name: _userName,
+                      weather: _currentWeather,
+                      city: _currentCity,
+                      loadingWeather: _loadingWeather,
+                      onTap: () => context.push('/weather', extra: {
+                        'lat': _currentLat,
+                        'lon': _currentLon,
+                        'city': _currentCity,
+                      }),
+                    ),
                     const SizedBox(height: 20),
                     _NewTripCard(onTap: () async {
                       await context.push('/route/input');
@@ -298,36 +336,110 @@ class _WeatherAlertCard extends StatelessWidget {
 // ─── 기존 위젯들 ───────────────────────────────────────────────
 class _GreetingCard extends StatelessWidget {
   final String name;
-  const _GreetingCard({required this.name});
+  final WeatherInfo? weather;
+  final String city;
+  final bool loadingWeather;
+  final VoidCallback onTap;
+
+  const _GreetingCard({
+    required this.name,
+    required this.onTap,
+    this.weather,
+    this.city = '',
+    this.loadingWeather = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF4A90D9), Color(0xFF6BB3F0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4A90D9), Color(0xFF6BB3F0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
         ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text('안녕하세요, $name님 👋',
-                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                Text('오늘 어디로 떠나고 싶으신가요?',
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13)),
+                Expanded(
+                  child: Text('안녕하세요, $name님 👋',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
+                ),
+                const Icon(Icons.arrow_forward_ios,
+                    color: Colors.white54, size: 14),
               ],
             ),
-          ),
-          const Icon(Icons.wb_sunny_outlined, color: Colors.white, size: 36),
-        ],
+            const SizedBox(height: 14),
+            if (loadingWeather)
+              Row(children: [
+                const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2)),
+                const SizedBox(width: 8),
+                Text('날씨 불러오는 중...',
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 13)),
+              ])
+            else if (weather != null) ...[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(weather!.emoji,
+                      style: const TextStyle(fontSize: 40)),
+                  const SizedBox(width: 14),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${weather!.temp.round()}°C',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w300,
+                              height: 1)),
+                      Text(weather!.descriptionKo,
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 14)),
+                      if (city.isNotEmpty)
+                        Text(city,
+                            style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
+                                fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text('탭하여 상세 날씨 보기 →',
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.6),
+                      fontSize: 11)),
+            ] else ...[
+              Row(children: [
+                const Icon(Icons.location_off_outlined,
+                    color: Colors.white54, size: 16),
+                const SizedBox(width: 6),
+                Text('위치 권한을 허용하거나 탭하여 도시 검색',
+                    style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.75),
+                        fontSize: 13)),
+              ]),
+            ],
+          ],
+        ),
       ),
     );
   }

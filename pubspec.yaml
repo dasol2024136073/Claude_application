@@ -48,6 +48,9 @@ dependencies:
   # 로컬 저장
   shared_preferences: ^2.5.3
 
+  # 위치
+  geolocator: ^13.0.2
+
   # 유틸
   intl: ^0.20.2
 
