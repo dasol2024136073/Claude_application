@@ -6,7 +6,8 @@ class AuthService {
   static const _currentUserKey = 'currentUser';
 
   static Future<({bool success, String? error})> register(
-      String name, String email, String password) async {
+      String name, String email, String password, {
+      String? gender, String? phone, String? birthDate}) async {
     final prefs = await SharedPreferences.getInstance();
     final users = _loadUsers(prefs);
 
@@ -14,7 +15,12 @@ class AuthService {
       return (success: false, error: '이미 사용 중인 이메일입니다');
     }
 
-    users.add({'name': name, 'email': email, 'password': password});
+    users.add({
+      'name': name, 'email': email, 'password': password,
+      'gender': ?gender,
+      'phone': ?phone,
+      'birthDate': ?birthDate,
+    });
     await prefs.setString(_usersKey, jsonEncode(users));
     await prefs.setString(_currentUserKey, jsonEncode({'name': name, 'email': email}));
     return (success: true, error: null);
