@@ -151,7 +151,7 @@ class _WeatherContent extends StatelessWidget {
         children: [
           _CurrentWeatherCard(forecast: forecast),
           const SizedBox(height: 20),
-          _SectionHeader(title: '시간별 날씨', subtitle: '3시간 간격 · 24시간'),
+          _SectionHeader(title: '시간별 날씨', subtitle: '3시간 간격 · 30시간'),
           const SizedBox(height: 10),
           _HourlyRow(hourly: forecast.hourly),
           const SizedBox(height: 20),
@@ -224,18 +224,15 @@ class _HourlyRow extends StatelessWidget {
   const _HourlyRow({required this.hourly});
 
   String _timeLabel(DateTime dt) {
-    final h = dt.hour;
-    if (h == 0) return '자정';
-    if (h == 12) return '정오';
-    final suffix = h < 12 ? '오전' : '오후';
-    final hour12 = h <= 12 ? h : h - 12;
-    return '$suffix\n$hour12시';
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100,
+      height: 116,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: hourly.length,
@@ -244,7 +241,7 @@ class _HourlyRow extends StatelessWidget {
           final item = hourly[i];
           final isFirst = i == 0;
           return Container(
-            width: 72,
+            width: 76,
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               color: isFirst
