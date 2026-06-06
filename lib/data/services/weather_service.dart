@@ -143,24 +143,37 @@ class WeatherService {
     }
   }
 
-  // 시간별·일별 예보 — 도시명 (한국어/영어 모두 가능)
+  // 시간별·일별 예보 — 도시명 (Geocoding API로 한국어·영어 모두 지원)
   static Future<WeatherForecast?> fetchForecastByCity(String city) async {
-    final englishCity = _cityMap[city] ?? city;
     try {
-      final current = await fetch(city);
+      // Geocoding API: 한국어 포함 어떤 언어든 좌표로 변환
+      final geoRes = await _dio.get(
+        'https://api.openweathermap.org/geo/1.0/direct',
+        queryParameters: {'q': city, 'limit': 1, 'appid': openWeatherApiKey},
+      );
+      final geoList = geoRes.data as List;
+      if (geoList.isEmpty) return null;
+
+      final lat = (geoList[0]['lat'] as num).toDouble();
+      final lon = (geoList[0]['lon'] as num).toDouble();
+      final localNames = geoList[0]['local_names'] as Map<String, dynamic>?;
+      final displayCity = localNames?['ko'] as String?
+          ?? geoList[0]['name'] as String;
+
+      // 좌표로 현재 날씨 + 예보 조회
+      final (current, _) = await fetchByCoords(lat, lon);
       if (current == null) return null;
 
-      final res = await _dio.get(
+      final forecastRes = await _dio.get(
         'https://api.openweathermap.org/data/2.5/forecast',
         queryParameters: {
-          'q': englishCity,
+          'lat': lat, 'lon': lon,
           'appid': openWeatherApiKey,
           'units': 'metric',
           'lang': 'kr',
         },
       );
-      final displayCity = res.data['city']?['name'] as String? ?? city;
-      return _parseForecast(res.data, current, displayCity);
+      return _parseForecast(forecastRes.data, current, displayCity);
     } catch (_) {
       return null;
     }
