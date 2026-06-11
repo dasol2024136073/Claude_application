@@ -60,6 +60,35 @@ class AuthService {
     return (await getCurrentUser()) != null;
   }
 
+  static Future<({bool success, String? error})> changePassword(
+      String currentPassword, String newPassword) async {
+    final current = await getCurrentUser();
+    if (current == null) return (success: false, error: '로그인 정보가 없습니다');
+
+    final prefs = await SharedPreferences.getInstance();
+    final users = _loadUsers(prefs);
+    final idx = users.indexWhere(
+        (u) => u['email'] == current['email'] && u['password'] == currentPassword);
+
+    if (idx == -1) return (success: false, error: '현재 비밀번호가 틀렸습니다');
+
+    users[idx]['password'] = newPassword;
+    await prefs.setString(_usersKey, jsonEncode(users));
+    return (success: true, error: null);
+  }
+
+  static Future<Map<String, dynamic>?> getUserDetails() async {
+    final current = await getCurrentUser();
+    if (current == null) return null;
+    final prefs = await SharedPreferences.getInstance();
+    final users = _loadUsers(prefs);
+    try {
+      return users.firstWhere((u) => u['email'] == current['email']);
+    } catch (_) {
+      return null;
+    }
+  }
+
   static List<Map<String, dynamic>> _loadUsers(SharedPreferences prefs) {
     final json = prefs.getString(_usersKey);
     if (json == null) return [];

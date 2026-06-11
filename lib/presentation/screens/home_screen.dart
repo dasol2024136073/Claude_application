@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Icon(Icons.explore, color: Color(0xFF4A90D9), size: 22),
             const SizedBox(width: 8),
-            const Text('AI 여행', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Tripia', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -172,12 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: _checkingWeather ? null : _manualWeatherCheck,
             ),
           GestureDetector(
-            onTap: () async {
-              final router = GoRouter.of(context);
-              await AuthService.logout();
-              if (!mounted) return;
-              router.go('/');
-            },
+            onTap: () => context.push('/mypage'),
             child: CircleAvatar(
               radius: 16,
               backgroundColor: const Color(0xFF4A90D9),

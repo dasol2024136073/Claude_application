@@ -9,6 +9,7 @@ import 'domain/models/trip_plan.dart';
 import 'presentation/screens/route_result_screen.dart';
 import 'presentation/screens/map_screen.dart';
 import 'presentation/screens/weather_screen.dart';
+import 'presentation/screens/mypage_screen.dart';
 import 'data/services/weather_service.dart';
 import 'presentation/theme/app_theme.dart';
 
@@ -19,6 +20,7 @@ final _router = GoRouter(
     GoRoute(path: '/signup', builder: (context, _) => const SignupScreen()),
     GoRoute(path: '/onboarding', builder: (context, _) => const OnboardingScreen()),
     GoRoute(path: '/home', builder: (context, _) => const HomeScreen()),
+    GoRoute(path: '/mypage', builder: (context, _) => const MyPageScreen()),
     GoRoute(path: '/route/input', builder: (context, _) => const RouteInputScreen()),
     GoRoute(
       path: '/route/result',
@@ -59,7 +61,7 @@ class TravelAiApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'AI 여행 경로 추천',
+      title: 'Tripia',
       theme: AppTheme.light,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,

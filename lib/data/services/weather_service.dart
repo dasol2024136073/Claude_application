@@ -162,9 +162,6 @@ class WeatherService {
     }
   }
 
-  static bool _hasKorean(String s) =>
-      s.runes.any((r) => r >= 0xAC00 && r <= 0xD7A3);
-
   // 시간별·일별 예보 — 도시명
   static Future<WeatherForecast?> fetchForecastByCity(String city) async {
     try {

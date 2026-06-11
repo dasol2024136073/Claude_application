@@ -204,7 +204,7 @@ class _HeroArea extends StatelessWidget {
             child: const Icon(Icons.explore_rounded, size: 54, color: Color(0xFF4A90D9)),
           ),
           const SizedBox(height: 20),
-          const Text('AI 여행 경로 추천',
+          const Text('Tripia',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
                   color: Color(0xFF1A1A2E), letterSpacing: -0.5)),
           const SizedBox(height: 8),
