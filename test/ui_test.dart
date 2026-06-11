@@ -21,7 +21,7 @@ void main() {
   testWidgets('로그인 화면에 앱 타이틀이 표시된다', (tester) async {
     await tester.pumpWidget(MaterialApp.router(routerConfig: _buildRouter()));
     await tester.pump();
-    expect(find.text('AI 여행 경로 추천'), findsOneWidget);
+    expect(find.text('Tripia'), findsOneWidget);
   });
 
   testWidgets('로그인 화면에 이메일·비밀번호 TextField가 2개 있다', (tester) async {
