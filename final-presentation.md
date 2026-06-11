@@ -56,6 +56,15 @@ style: |
   .badge.alt { background: #ecfdf5; border-color: #10b981; color: #065f46; }
   .badge.warn { background: #fff7ed; border-color: #f97316; color: #9a3412; }
 
+  /* === 표 안의 작은 기술 태그 (WBS) === */
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px;
+    background: #eff6ff; border: 1px solid #3b82f6; color: #1e3a8a;
+    font-weight: 700; font-size: 0.85em; margin: 1px 3px 1px 0;
+  }
+  .tag.alt { background: #ecfdf5; border-color: #10b981; color: #065f46; }
+  .tag.warn { background: #fff7ed; border-color: #f97316; color: #9a3412; }
+
   /* === 카드 그리드 (문제정의, 핵심기능) === */
   .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
   .card {
@@ -182,19 +191,19 @@ style: |
 <span class="badge">SharedPreferences</span>
 </div>
 
-| 모듈 (WBS) | 산출물 | 상태 |
-|---|---|---|
-| 1. 인증 모듈 | 로그인/회원가입/마이페이지 | ✅ 완료 |
-| 2. AI 경로 추천 모듈 | 입력 → Gemini 생성 → 결과 화면 | ✅ 완료 |
-| 3. 실시간 상황 반영 | 날씨 연동 + 변화 감지 알림 | ✅ 완료 |
-| 4. 지도 모듈 | flutter_map 경로 시각화 | ✅ 완료 |
-| 5. 마이페이지 모듈 | 경로 저장/조회/삭제, 프로필 | ✅ 완료 |
-| 6. 문서·QA | 38개 테스트, ADR 4개, docs 5종 | ✅ 완료 |
+| 모듈 (WBS) | 산출물 | 사용 기술 | 상태 |
+|---|---|---|---|
+| 1. 인증 모듈 | 로그인/회원가입/마이페이지 | <span class="tag">SharedPreferences</span><span class="tag">GoRouter</span> | ✅ 완료 |
+| 2. AI 경로 추천 모듈 | 입력 → Gemini 생성 → 결과 화면 | <span class="tag alt">Gemini 2.5 Flash</span><span class="tag">Dio</span> | ✅ 완료 |
+| 3. 실시간 상황 반영 | 날씨 연동 + 변화 감지 알림 | <span class="tag warn">OpenWeatherMap</span><span class="tag">Timer</span> | ✅ 완료 |
+| 4. 지도 모듈 | flutter_map 경로 시각화 | <span class="tag">flutter_map</span><span class="tag">OSM</span> | ✅ 완료 |
+| 5. 마이페이지 모듈 | 경로 저장/조회/삭제, 프로필 | <span class="tag">SharedPreferences</span><span class="tag">GoRouter</span> | ✅ 완료 |
+| 6. 문서·QA | 38개 테스트, ADR 4개, docs 5종 | <span class="tag">flutter_test</span><span class="tag alt">Marp CI</span> | ✅ 완료 |
 
 <!--
 [프로젝트계획 / 0:35~1:00]
 기술 스택은 Flutter Web, Dart, GoRouter, Gemini 2.5 Flash, OpenWeatherMap, flutter_map, SharedPreferences입니다.
-WBS 기준으로 인증, AI 경로 추천, 실시간 상황 반영, 지도, 마이페이지, 문서·QA까지 총 6개 모듈을 모두 완료했습니다.
+WBS 기준으로 인증, AI 경로 추천, 실시간 상황 반영, 지도, 마이페이지, 문서·QA까지 총 6개 모듈을 모두 완료했고, 각 모듈에 사용한 핵심 기술을 표에 함께 정리했습니다.
 원래 36개 산출물 중 7주 일정에 맞게 핵심 기능 위주로 재설계해서 진행했습니다.
 -->
 
