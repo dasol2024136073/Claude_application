@@ -337,23 +337,36 @@ flutter_map + OpenStreetMap, 번호 마커 + 폴리라인으로 동선 표시 (A
 
 ## 개발 환경 설정 & 빌드/배포
 
-```bash
-# 1. 클론 & 의존성
-git clone https://github.com/dasol2024136073/Claude_application.git
-cd Claude_application && flutter pub get
+<div class="arch-grid">
 
-# 2. API 키 설정 (lib/core/config.dart 직접 생성, gitignore 처리됨)
-const geminiApiKey = '...';
-const openWeatherApiKey = '...';
+<div>
 
-# 3. 실행 (디버그)
-flutter run -d chrome
+### 로컬 실행 — 4단계
 
-# 4. 릴리스 빌드
-flutter build web --release
-```
+<div class="flow-item"><div class="flow-num l1">1</div><div class="flow-text">저장소 클론 + <code>flutter pub get</code></div></div>
+<div class="flow-item"><div class="flow-num l1">2</div><div class="flow-text"><code>lib/core/config.dart</code> 생성, API 키 2개 입력 (gitignore 처리)</div></div>
+<div class="flow-item"><div class="flow-num l1">3</div><div class="flow-text"><code>flutter run -d chrome</code>로 디버그 실행</div></div>
+<div class="flow-item"><div class="flow-num l1">4</div><div class="flow-text"><code>flutter build web --release</code>로 배포용 빌드</div></div>
 
-<div class="badges">
+</div>
+
+<div>
+
+### 빌드 → 배포 파이프라인
+
+<div class="layers">
+<div class="layer l1">코드 push (main) <span class="desc">git push origin main</span></div>
+<div class="layer-arrow">↓</div>
+<div class="layer l2">발표 슬라이드 <span class="desc">Marp CI 자동 빌드 → GitHub Pages</span></div>
+<div class="layer-arrow">↓</div>
+<div class="layer l3">Flutter 앱 <span class="desc">flutter build web --release → 정적 호스팅 (수동)</span></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="badges" style="margin-top: 14px;">
 <span class="badge alt">버전: SemVer (1.0.0+1)</span>
 <span class="badge alt">롤백: git revert + 재배포</span>
 <span class="badge warn">자세한 내용: docs/deploy.md</span>
@@ -361,10 +374,10 @@ flutter build web --release
 
 <!--
 [개발환경/빌드배포 / 2:10~2:30]
-개발 환경은 docs/setup.md 기준으로, 클론 후 flutter pub get, 그리고 lib/core/config.dart에 API 키 2개만 넣으면 바로 실행됩니다.
-빌드는 flutter build web --release로 release 빌드를 만들고,
-버전은 SemVer(1.0.0+1) 규칙을 따르며, 문제 발생 시 git revert로 롤백합니다.
-자세한 내용은 docs/deploy.md에 정리해뒀습니다.
+왼쪽은 로컬 실행 4단계입니다. 클론 후 flutter pub get, lib/core/config.dart에 API 키 2개만 넣으면 flutter run -d chrome으로 바로 실행됩니다.
+오른쪽은 빌드~배포 파이프라인인데, main에 push하면 발표 슬라이드는 Marp CI가 자동으로 GitHub Pages에 배포하고,
+Flutter 앱은 flutter build web --release로 빌드한 산출물을 정적 호스팅에 수동으로 올리는 구조입니다.
+버전은 SemVer(1.0.0+1) 규칙을 따르며, 문제 발생 시 git revert로 롤백합니다. 자세한 내용은 docs/deploy.md에 정리해뒀습니다.
 -->
 
 ---
