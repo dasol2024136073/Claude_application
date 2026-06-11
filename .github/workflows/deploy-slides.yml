@@ -31,7 +31,8 @@ jobs:
       - name: Build slides
         run: |
           mkdir -p dist
-          marp midterm-presentation.md --html --output dist/index.html
+          marp final-presentation.md --html --output dist/index.html
+          marp midterm-presentation.md --html --output dist/midterm.html
           touch dist/.nojekyll
 
       - name: Upload artifact
