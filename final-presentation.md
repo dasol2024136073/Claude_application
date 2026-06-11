@@ -7,50 +7,84 @@ transition: fade
 style: |
   section {
     font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-    background: #ffffff;
+    background:
+      linear-gradient(#d3e8da, #d3e8da) top left / 100% 16px no-repeat,
+      linear-gradient(#d3e8da, #d3e8da) bottom left / 100% 16px no-repeat,
+      #ffffff;
     color: #0f172a;
     padding: 48px 68px;
-    font-size: 19px;
+    font-size: 23px;
   }
   h1 { font-size: 2.3em; font-weight: 800; color: #0f172a; margin-bottom: 10px; }
-  h2 { font-size: 1.45em; font-weight: 700; color: #1e3a8a;
-       border-bottom: 3px solid #3b82f6; padding-bottom: 8px; margin-bottom: 22px; }
+  h2 { font-size: 1.45em; font-weight: 700; color: #4a6b52;
+       border-bottom: 3px solid #7eab8f; padding-bottom: 8px; margin-bottom: 22px; }
   h3 { font-size: 1.05em; font-weight: 600; color: #334155; margin-bottom: 6px; }
   p  { line-height: 1.6; }
   ul { padding-left: 1.2em; }
   li { margin-bottom: 5px; line-height: 1.5; }
   table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
-  th { background: #1e3a8a; color: #ffffff; padding: 8px 14px; text-align: left; }
-  td { padding: 7px 14px; border-bottom: 1px solid #e2e8f0; color: #1e3a8a; }
+  th { background: #4a6b52; color: #ffffff; padding: 8px 14px; text-align: left; }
+  td { padding: 7px 14px; border-bottom: 1px solid #e2e8f0; color: #4a6b52; }
   tr:nth-child(even) td { background: #f8fafc; }
   blockquote {
-    border-left: 4px solid #3b82f6;
-    background: #eff6ff;
-    color: #1e3a8a;
+    border-left: 4px solid #7eab8f;
+    background: #f2f7f4;
+    color: #4a6b52;
     padding: 12px 20px;
     border-radius: 0 8px 8px 0;
     margin: 16px 0;
     font-style: normal;
   }
-  strong { color: #1e3a8a; }
+  strong { color: #4a6b52; }
+
+  /* === 알약 배지 (전체 톤) === */
+  .kicker {
+    display: inline-block; background: #0f172a; color: #fff;
+    font-weight: 800; letter-spacing: 0.12em; font-size: 0.75em;
+    text-transform: uppercase; padding: 8px 24px; border-radius: 999px;
+    margin-bottom: 14px;
+  }
 
   /* === 표지 / 마무리 === */
-  section.cover { background: #0f172a; color: #ffffff; justify-content: center; }
-  section.cover h1 { color: #ffffff; font-size: 2.8em; }
-  section.cover p  { color: #94a3b8; font-size: 1.1em; margin-top: 8px; }
-  section.cover .sub { color: #60a5fa; font-size: 1.05em; }
-  section.end { background: #0f172a; color: #ffffff; justify-content: center; text-align: center; }
-  section.end h2 { border: none; color: #60a5fa; }
-  section.qa { background: #1e3a8a; color: #ffffff; }
-  section.qa h2 { color: #ffffff; border-color: #60a5fa; }
+  section.cover { color: #0f172a; justify-content: center; }
+  section.cover h1 { color: #0f172a; font-size: 3.4em; font-weight: 900; }
+  section.cover h2 { border: none; color: #4a6b52; font-size: 1.3em; margin-bottom: 14px; font-weight: 700; }
+  section.cover p  { color: #475569; font-size: 1.1em; margin-top: 8px; }
+  section.cover .sub { color: #4a6b52; font-size: 1.05em; font-weight: 700; }
+  .author-tag { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.95em; color: #0f172a; }
+  .author-tag .dot {
+    width: 34px; height: 34px; border-radius: 50%; background: #4a6b52; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 1.1em; flex-shrink: 0;
+  }
+  .title-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 0.85em; height: 0.85em; border-radius: 50%; background: #4a6b52; color: #fff;
+    font-size: 0.55em; vertical-align: middle; margin-left: 14px;
+  }
+  section.end { color: #0f172a; justify-content: center; text-align: center; }
+  section.end h2 { border: none; color: #4a6b52; font-size: 2em; }
+  section.qa { background: #4a6b52; color: #ffffff; }
+  section.qa h2 { color: #ffffff; border-color: #a3c9b2; }
   section.qa li, section.qa p { color: #e2e8f0; }
-  section.qa strong { color: #93c5fd; }
+  section.qa strong { color: #c2ddcb; }
+
+  /* === 큰 챕터 번호 (제목 앞 강조) === */
+  .chnum { font-size: 1.3em; font-weight: 900; color: #0f172a; margin-right: 14px; }
+
+  /* === 세로 구분선 컬럼 === */
+  .col-grid { display: flex; gap: 0; margin-top: 24px; width: 100%; box-sizing: border-box; }
+  .col-grid > div { flex: 1; padding: 4px 28px; text-align: center; }
+  .col-grid > div:not(:first-child) { border-left: 1px solid #cbd5e1; }
+  .col-grid .icon { font-size: 2.4em; margin-bottom: 10px; }
+  .col-grid h3 { font-size: 1.1em; margin-bottom: 8px; text-align: center; }
+  .col-grid p { font-size: 0.88em; color: #475569; line-height: 1.5; margin: 0; }
 
   /* === 뱃지 (기술 스택, 가산점) === */
   .badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+  .badges.center { justify-content: center; width: 100%; box-sizing: border-box; align-self: stretch; }
   .badge {
     display: inline-block; padding: 8px 18px; border-radius: 999px;
-    background: #eff6ff; border: 2px solid #3b82f6; color: #1e3a8a;
+    background: #f2f7f4; border: 2px solid #7eab8f; color: #4a6b52;
     font-weight: 700; font-size: 0.95em;
   }
   .badge.alt { background: #ecfdf5; border-color: #10b981; color: #065f46; }
@@ -59,37 +93,41 @@ style: |
   /* === 표 안의 작은 기술 태그 (WBS) === */
   .tag {
     display: inline-block; padding: 2px 10px; border-radius: 999px;
-    background: #eff6ff; border: 1px solid #3b82f6; color: #1e3a8a;
+    background: #f2f7f4; border: 1px solid #7eab8f; color: #4a6b52;
     font-weight: 700; font-size: 0.85em; margin: 1px 3px 1px 0;
   }
   .tag.alt { background: #ecfdf5; border-color: #10b981; color: #065f46; }
   .tag.warn { background: #fff7ed; border-color: #f97316; color: #9a3412; }
 
   /* === 카드 그리드 (문제정의, 핵심기능) === */
-  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; width: 100%; box-sizing: border-box; }
   .card {
     border: 2px solid #e2e8f0; border-radius: 14px; padding: 16px 18px;
     background: #f8fafc;
   }
   .card .icon { font-size: 2em; margin-bottom: 6px; }
-  .card h3 { color: #1e3a8a; margin-bottom: 6px; }
+  .card h3 { color: #4a6b52; margin-bottom: 6px; }
   .card.bad { border-color: #fecaca; background: #fef2f2; }
-  .card.good { border-color: #bbf7d0; background: #f0fdf4; }
+  .card.good { border-color: #d3e8da; background: #f2f7f4; }
+  .cards.compact { margin: 8px 0 14px; }
+  .cards.compact .card { padding: 6px 18px; }
+  .cards.compact ~ table th,
+  .cards.compact ~ table td { padding: 4px 14px; }
 
   /* === 타임라인 (진행과정) === */
   .timeline { display: flex; justify-content: space-between; margin: 28px 0 8px; position: relative; }
   .timeline::before {
     content: ''; position: absolute; top: 14px; left: 4%; right: 4%;
-    height: 4px; background: #bfdbfe; z-index: 0;
+    height: 4px; background: #d3e8da; z-index: 0;
   }
   .tl-item { flex: 1; text-align: center; position: relative; z-index: 1; }
   .tl-dot {
-    width: 30px; height: 30px; border-radius: 50%; background: #3b82f6; color: #fff;
+    width: 30px; height: 30px; border-radius: 50%; background: #7eab8f; color: #fff;
     display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;
-    font-weight: 800; font-size: 0.85em; border: 4px solid #ffffff; box-shadow: 0 0 0 2px #3b82f6;
+    font-weight: 800; font-size: 0.85em; border: 4px solid #ffffff; box-shadow: 0 0 0 2px #7eab8f;
   }
   .tl-item.done .tl-dot { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
-  .tl-label { font-size: 0.85em; font-weight: 700; color: #1e3a8a; }
+  .tl-label { font-size: 0.85em; font-weight: 700; color: #4a6b52; }
   .tl-sub { font-size: 0.75em; color: #64748b; margin-top: 2px; }
 
   /* === 레이어 다이어그램 (아키텍처) === */
@@ -99,9 +137,9 @@ style: |
     display: flex; justify-content: space-between; align-items: center;
   }
   .layer .desc { font-weight: 400; font-size: 0.85em; opacity: 0.9; }
-  .layer.l1 { background: #1e3a8a; }
-  .layer.l2 { background: #2563eb; }
-  .layer.l3 { background: #3b82f6; }
+  .layer.l1 { background: #4a6b52; }
+  .layer.l2 { background: #5f8a6f; }
+  .layer.l3 { background: #7eab8f; }
   .layer-arrow { text-align: center; color: #94a3b8; font-size: 1.2em; margin: -4px 0; }
 
   /* === 아키텍처 슬라이드: 2단 구성 (다이어그램 + 실제 흐름 예시) === */
@@ -113,27 +151,27 @@ style: |
     flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; color: #fff;
     font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.85em;
   }
-  .flow-num.l1 { background: #1e3a8a; }
-  .flow-num.l2 { background: #2563eb; }
-  .flow-num.l3 { background: #3b82f6; }
+  .flow-num.l1 { background: #4a6b52; }
+  .flow-num.l2 { background: #5f8a6f; }
+  .flow-num.l3 { background: #7eab8f; }
   .flow-text { font-size: 0.92em; line-height: 1.5; padding-top: 3px; }
-  .flow-text code { background: #eff6ff; padding: 1px 6px; border-radius: 4px; color: #1e3a8a; }
+  .flow-text code { background: #f2f7f4; padding: 1px 6px; border-radius: 4px; color: #4a6b52; }
 
   /* === 테스트 구성 막대 + 범례 (코드품질 슬라이드) === */
-  .test-bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; margin: 14px 0 12px; }
-  .test-bar .seg { display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.85em; }
-  .test-bar .seg.t1 { background: #1e3a8a; }
-  .test-bar .seg.t2 { background: #2563eb; }
-  .test-bar .seg.t3 { background: #3b82f6; }
-  .test-bar .seg.t4 { background: #60a5fa; }
-  .test-bar .seg.t5 { background: #93c5fd; color: #1e3a8a; }
+  .test-bar { display: table; width: 100%; table-layout: fixed; border-spacing: 0; height: 34px; border-radius: 8px; overflow: hidden; margin: 14px 0 12px; }
+  .test-bar .seg { display: table-cell; text-align: center; vertical-align: middle; color: #fff; font-weight: 700; font-size: 0.85em; }
+  .test-bar .seg.t1 { background: #4a6b52; }
+  .test-bar .seg.t2 { background: #5f8a6f; }
+  .test-bar .seg.t3 { background: #7eab8f; }
+  .test-bar .seg.t4 { background: #a3c9b2; }
+  .test-bar .seg.t5 { background: #c2ddcb; color: #4a6b52; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85em; margin-bottom: 6px; }
   .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
-  .legend-dot.t1 { background: #1e3a8a; }
-  .legend-dot.t2 { background: #2563eb; }
-  .legend-dot.t3 { background: #3b82f6; }
-  .legend-dot.t4 { background: #60a5fa; }
-  .legend-dot.t5 { background: #93c5fd; }
+  .legend-dot.t1 { background: #4a6b52; }
+  .legend-dot.t2 { background: #5f8a6f; }
+  .legend-dot.t3 { background: #7eab8f; }
+  .legend-dot.t4 { background: #a3c9b2; }
+  .legend-dot.t5 { background: #c2ddcb; }
 
   /* === 체크리스트 === */
   .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin-top: 12px; }
@@ -141,15 +179,33 @@ style: |
   .check-item .mark { color: #10b981; font-size: 1.2em; }
 
   /* === 데모 강조 === */
-  section.demo { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: #fff; justify-content: center; }
-  section.demo h1, section.demo h2 { color: #fff; border: none; }
-  section.demo p { color: #dbeafe; }
+  section.demo { background: linear-gradient(135deg, #e6f1ea, #d3e8da); color: #33503c; justify-content: center; }
+  section.demo h1, section.demo h2 { color: #33503c; border: none; }
+  section.demo p { color: #4a6b52; }
+
+  /* === 본문 글씨 검은색 (제목/표 헤더 제외) === */
+  section.mono-text td,
+  section.mono-text strong,
+  section.mono-text blockquote,
+  section.mono-text .badge,
+  section.mono-text .badge.alt,
+  section.mono-text .badge.warn,
+  section.mono-text .tag,
+  section.mono-text .tag.alt,
+  section.mono-text .tag.warn,
+  section.mono-text .card h3,
+  section.mono-text.demo p,
+  section.mono-text.demo li,
+  section.mono-text.demo h3,
+  section.mono-text.demo strong { color: #0f172a; }
 ---
 
 <!-- _class: cover -->
 <!-- transition: fade -->
 
-# Tripia
+<span class="kicker">AI Travel Planner</span>
+
+# Tripia <span class="title-icon">✈️</span>
 ## AI 여행 경로 추천 앱
 
 <br>
@@ -161,9 +217,9 @@ style: |
 
 <span class="sub">취향 프로필 + 실시간 날씨를 Gemini AI가 분석해 10초 만에 나만의 여행 동선을 설계합니다</span>
 
-<br><br>
-
-**임다솔** · Flutter Web · 2026 기말 발표 (5분)
+<div style="margin-top: 40px;">
+<div class="author-tag"><div class="dot">📘</div>임다솔 · Flutter Web · 2026 기말 발표 (5분)</div>
+</div>
 
 <!--
 [비전 / 0:00~0:15]
@@ -174,23 +230,23 @@ style: |
 
 ---
 
-## 문제 정의 — 여행 계획, 왜 이렇게 피곤할까?
+## <span class="chnum">01</span> 문제 정의 — 여행 계획, 왜 이렇게 피곤할까?
 
-<div class="cards">
-<div class="card bad">
+<div class="col-grid">
+<div>
 <div class="icon">😩</div>
 <h3>계획 피로</h3>
-여행지·맛집·동선을 검색하느라 수십 개의 탭을 열어야 한다
+<p>여행지·맛집·동선을 검색하느라 수십 개의 탭을 열어야 한다</p>
 </div>
-<div class="card bad">
+<div>
 <div class="icon">📋</div>
 <h3>획일적 추천</h3>
-블로그·유튜브는 모두에게 같은 코스를 추천한다
+<p>블로그·유튜브는 모두에게 같은 코스를 추천한다</p>
 </div>
-<div class="card bad">
+<div>
 <div class="icon">🌧️</div>
 <h3>상황 대응 불가</h3>
-갑자기 비가 오면 처음부터 다시 검색해야 한다
+<p>갑자기 비가 오면 처음부터 다시 검색해야 한다</p>
 </div>
 </div>
 
@@ -209,6 +265,8 @@ style: |
 -->
 
 ---
+
+<!-- _class: mono-text -->
 
 ## 프로젝트 계획 — WBS & 기술 스택
 
@@ -316,23 +374,23 @@ GoRouter로 8개 경로를 관리합니다.
 
 ---
 
-## 구현 방법 — 핵심 기능 3가지
+## <span class="chnum">02</span> 구현 방법 — 핵심 기능 3가지
 
-<div class="cards">
-<div class="card good">
+<div class="col-grid">
+<div>
 <div class="icon">🤖</div>
 <h3>AI 경로 생성</h3>
-취향+날씨 컨텍스트를 Gemini 2.5 Flash에 전달, <code>_extractJson()</code>으로 마크다운 방어 파싱
+<p>취향+날씨 컨텍스트를 Gemini 2.5 Flash에 전달, <code>_extractJson()</code>으로 마크다운 방어 파싱</p>
 </div>
-<div class="card good">
+<div>
 <div class="icon">🌦️</div>
 <h3>실시간 날씨 반영</h3>
-OpenWeatherMap → 60+ 도시 매핑 → outdoor/indoor 카테고리 변화 시 재추천 알림
+<p>OpenWeatherMap → 60+ 도시 매핑 → outdoor/indoor 카테고리 변화 시 재추천 알림</p>
 </div>
-<div class="card good">
+<div>
 <div class="icon">🗺️</div>
 <h3>지도 시각화</h3>
-flutter_map + OpenStreetMap, 번호 마커 + 폴리라인으로 동선 표시 (API 키 불필요)
+<p>flutter_map + OpenStreetMap, 번호 마커 + 폴리라인으로 동선 표시 (API 키 불필요)</p>
 </div>
 </div>
 
@@ -427,7 +485,7 @@ Flutter 앱은 flutter build web --release로 빌드한 산출물을 정적 호�
 
 ---
 
-## 코드 품질 · 테스트
+## <span class="chnum">03</span> 코드 품질 · 테스트
 
 <div class="badges">
 <span class="badge alt">flutter analyze 경고 0개</span>
@@ -437,11 +495,11 @@ Flutter 앱은 flutter build web --release로 빌드한 산출물을 정적 호�
 ### 테스트 38개 구성
 
 <div class="test-bar">
-<div class="seg t1" style="width: 10.5%">4</div>
-<div class="seg t2" style="width: 34.2%">13</div>
-<div class="seg t3" style="width: 18.4%">7</div>
-<div class="seg t4" style="width: 15.8%">6</div>
-<div class="seg t5" style="width: 21.1%">8</div>
+<div class="seg t1" style="width: 10.53%">4</div>
+<div class="seg t2" style="width: 34.21%">13</div>
+<div class="seg t3" style="width: 18.42%">7</div>
+<div class="seg t4" style="width: 15.79%">6</div>
+<div class="seg t5" style="width: 21.05%">8</div>
 </div>
 
 <div class="check-grid">
@@ -482,6 +540,8 @@ Flutter 앱은 flutter build web --release로 빌드한 산출물을 정적 호�
 
 ---
 
+<!-- _class: mono-text -->
+
 ## ADR 요약 (질의응답 대비, 4개)
 
 | ADR | 결정 | 핵심 이유 |
@@ -506,11 +566,13 @@ ADR-0001은 Flutter 선택, ADR-0002는 계획 단계의 Riverpod, ADR-0003은 �
 
 ---
 
+<!-- _class: mono-text -->
+
 ## 활용 방안 & 기대 효과
 
 > **활용 시나리오**: 주말 당일치기 직장인이 "수원 1박 2일" 입력 → 10초 내 일정 생성 → 비 예보 시 실내 코스로 자동 재추천
 
-<div class="cards" style="grid-template-columns: 1fr 1fr;">
+<div class="cards compact" style="grid-template-columns: 1fr 1fr;">
 <div class="card bad">
 <div class="icon">😩</div>
 <h3>기존 여행 계획</h3>
@@ -587,7 +649,7 @@ AUTHORING.임다솔.v0.4.0.md 한 파일에 Skills, Rules, Commands를 통합해
 
 ---
 
-<!-- _class: demo -->
+<!-- _class: demo mono-text -->
 <!-- transition: wipe-left -->
 
 # 🎬 시연 데모 (30초)
@@ -611,9 +673,11 @@ AUTHORING.임다솔.v0.4.0.md 한 파일에 Skills, Rules, Commands를 통합해
 
 <!-- _class: end -->
 
+<span class="kicker">Thank You</span>
+
 # 마무리 & 향후 발전 방향
 
-<div class="badges" style="justify-content: center;">
+<div class="badges center">
 <span class="badge">Firebase Auth 전환</span>
 <span class="badge alt">커뮤니티 공유 기능</span>
 <span class="badge warn">다국어 지원</span>
