@@ -113,6 +113,23 @@ app.*.symbols
 # API 키 파일 (절대 커밋 금지)
 lib/core/config.dart
 
+# Flutter web build output accidentally placed at repo root
+/index.html
+/main.dart.js
+/flutter.js
+/flutter_bootstrap.js
+/flutter_service_worker.js
+/manifest.json
+/favicon.png
+/version.json
+/assets/
+/canvaskit/
+/icons/
+
+# IDE
+.idea/
+*.iml
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
