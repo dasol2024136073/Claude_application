@@ -23,7 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _checkAlreadyLoggedIn() async {
     if (await AuthService.isLoggedIn()) {
-      if (mounted) context.go('/home');
+      if (!mounted) return;
+      final onboarded = await AuthService.isOnboardingCompleted();
+      if (!mounted) return;
+      context.go(onboarded ? '/home' : '/welcome');
     }
   }
 
@@ -42,7 +45,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (result.success) {
-      context.go('/home');
+      final onboarded = await AuthService.isOnboardingCompleted();
+      if (!mounted) return;
+      context.go(onboarded ? '/home' : '/welcome');
     } else {
       _showError(result.error ?? '로그인 실패');
     }
@@ -65,12 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color(0xFFF4F8F5),
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(flex: 4, child: _HeroArea()),
-            Expanded(flex: 6, child: _buildLoginCard()),
+            Expanded(flex: 5, child: _HeroArea()),
+            Expanded(flex: 4, child: _buildLoginCard()),
           ],
         ),
       ),
@@ -104,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               decoration: _inputDecoration('이메일', 'example@email.com',
-                  const Icon(Icons.email_outlined, color: Color(0xFF4A90D9))),
+                  const Icon(Icons.email_outlined, color: Color(0xFF4F9D6E))),
             ),
             const SizedBox(height: 12),
             // 비밀번호
@@ -113,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
               obscureText: _obscure,
               onSubmitted: (_) => _login(),
               decoration: _inputDecoration('비밀번호', '비밀번호 입력',
-                  const Icon(Icons.lock_outline, color: Color(0xFF4A90D9)),
+                  const Icon(Icons.lock_outline, color: Color(0xFF4F9D6E)),
                   suffix: IconButton(
                     icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility,
                         color: Colors.grey[400]),
@@ -147,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () => context.push('/signup'),
                   child: const Text('회원가입',
                       style: TextStyle(fontWeight: FontWeight.bold,
-                          color: Color(0xFF4A90D9))),
+                          color: Color(0xFF4F9D6E))),
                 ),
               ],
             ),
@@ -172,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
       enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFFE8E8E8))),
       focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF4A90D9), width: 2)),
+          borderSide: const BorderSide(color: Color(0xFF4F9D6E), width: 2)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
@@ -183,35 +188,58 @@ class _HeroArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: const Color(0xFFF5F7FA),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4A90D9).withValues(alpha: 0.15),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: const Icon(Icons.explore_rounded, size: 54, color: Color(0xFF4A90D9)),
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/images/for.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF1A1A2E).withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.45),
+            ],
           ),
-          const SizedBox(height: 20),
-          const Text('Tripia',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A1A2E), letterSpacing: -0.5)),
-          const SizedBox(height: 8),
-          Text('당신의 발걸음을 AI가 별자리처럼 이어\n이 세상 어디에도 없던 하나뿐인 여행',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Colors.grey[500], height: 1.6)),
-        ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4F9D6E).withValues(alpha: 0.25),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.flight_rounded, size: 60, color: Color(0xFF4F9D6E)),
+            ),
+            const SizedBox(height: 20),
+            const Text('Tripia',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800,
+                    color: Colors.white, letterSpacing: -0.5,
+                    shadows: [
+                      Shadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 2)),
+                    ])),
+            const SizedBox(height: 8),
+            const Text('당신의 발걸음을 AI가 별자리처럼 이어\n이 세상 어디에도 없던 하나뿐인 여행',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13, color: Colors.white, height: 1.6,
+                    shadows: [
+                      Shadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(0, 1)),
+                    ])),
+          ],
+        ),
       ),
     );
   }

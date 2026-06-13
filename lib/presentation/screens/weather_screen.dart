@@ -114,9 +114,9 @@ class _SearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: '도시 검색 (예: 도쿄, Paris, Bangkok)',
           hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF4A90D9)),
+          prefixIcon: const Icon(Icons.search, color: Color(0xFF4F9D6E)),
           suffixIcon: IconButton(
-            icon: const Icon(Icons.send_rounded, color: Color(0xFF4A90D9)),
+            icon: const Icon(Icons.send_rounded, color: Color(0xFF4F9D6E)),
             onPressed: () => onSearch(controller.text),
           ),
           filled: true,
@@ -129,7 +129,7 @@ class _SearchBar extends StatelessWidget {
               borderSide: const BorderSide(color: Color(0xFFE8E8E8))),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFF4A90D9), width: 2)),
+              borderSide: const BorderSide(color: Color(0xFF4F9D6E), width: 2)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
@@ -177,7 +177,7 @@ class _CurrentWeatherCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF4A90D9), Color(0xFF6BB3F0)],
+          colors: [Color(0xFF4F9D6E), Color(0xFF6BB3F0)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -245,11 +245,11 @@ class _HourlyRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               color: isFirst
-                  ? const Color(0xFF4A90D9).withValues(alpha: 0.12)
+                  ? const Color(0xFF4F9D6E).withValues(alpha: 0.12)
                   : Colors.white,
               borderRadius: BorderRadius.circular(14),
               border: isFirst
-                  ? Border.all(color: const Color(0xFF4A90D9), width: 1.5)
+                  ? Border.all(color: const Color(0xFF4F9D6E), width: 1.5)
                   : null,
               boxShadow: [
                 BoxShadow(
@@ -265,7 +265,7 @@ class _HourlyRow extends StatelessWidget {
                     style: TextStyle(
                         fontSize: 11,
                         color: isFirst
-                            ? const Color(0xFF4A90D9)
+                            ? const Color(0xFF4F9D6E)
                             : Colors.grey[500],
                         fontWeight: isFirst
                             ? FontWeight.w700
@@ -276,7 +276,7 @@ class _HourlyRow extends StatelessWidget {
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: isFirst
-                            ? const Color(0xFF4A90D9)
+                            ? const Color(0xFF4F9D6E)
                             : const Color(0xFF1A1A2E))),
               ],
             ),

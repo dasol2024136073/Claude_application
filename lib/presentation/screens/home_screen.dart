@@ -4,9 +4,11 @@ import 'package:geolocator/geolocator.dart';
 import '../../data/mock/mock_trip_data.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/services/gemini_service.dart';
+import '../../data/services/recommendation_repository.dart';
 import '../../data/services/trip_repository.dart';
 import '../../data/services/weather_monitor_service.dart';
 import '../../data/services/weather_service.dart';
+import '../../domain/models/destination_recommendation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +27,9 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentCity = '';
   double? _currentLat, _currentLon;
   bool _loadingWeather = false;
+  List<DestinationRecommendation> _recommendations = [];
+  bool _loadingRecommendations = true;
+  bool _generatingNearby = false;
 
   @override
   void initState() {
@@ -49,6 +54,23 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     _startWeatherMonitoring(trips);
     _loadCurrentWeather();
+    _loadRecommendations();
+  }
+
+  Future<void> _loadRecommendations() async {
+    final user = await AuthService.getUserDetails();
+    final recommendations = await RecommendationRepository.getOrFetch(
+      travelStyles: (user?['travelStyles'] as List<dynamic>?)?.cast<String>() ?? [],
+      budgets: (user?['budgets'] as List<dynamic>?)?.cast<String>() ?? [],
+      companions: (user?['companions'] as List<dynamic>?)?.cast<String>() ?? [],
+      regions: (user?['regions'] as List<dynamic>?)?.cast<String>() ?? [],
+      intensities: (user?['intensities'] as List<dynamic>?)?.cast<String>() ?? [],
+    );
+    if (!mounted) return;
+    setState(() {
+      _recommendations = recommendations;
+      _loadingRecommendations = false;
+    });
   }
 
   Future<void> _loadCurrentWeather() async {
@@ -70,6 +92,41 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {
       if (mounted) setState(() => _loadingWeather = false);
     }
+  }
+
+  Future<void> _generateNearbyNow() async {
+    if (_currentCity.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('현재 위치를 확인할 수 없어요. 위치 권한을 허용해주세요.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _generatingNearby = true);
+
+    final now = DateTime.now();
+    final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+    final plan = await GeminiService.generateTripPlan(
+      _currentCity,
+      0,
+      weather: _currentWeather,
+      arrivalTime: currentTime,
+      nearbyNow: true,
+    ).catchError((_) => MockTripData.generate(_currentCity, 0));
+
+    if (!mounted) return;
+    setState(() => _generatingNearby = false);
+
+    context.push('/route/result', extra: {
+      'destination': _currentCity,
+      'days': 0,
+      'tripPlan': plan,
+      'weather': _currentWeather,
+    });
   }
 
   void _startWeatherMonitoring(List<SavedTrip> trips) {
@@ -132,20 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future<void> _delete(String id) async {
-    final messenger = ScaffoldMessenger.of(context);
-    await TripRepository.delete(id);
-    final trips = await TripRepository.getAll();
-    if (!mounted) return;
-    setState(() {
-      _trips = trips;
-      _weatherAlerts.removeWhere((a) => a.trip.id == id);
-    });
-    messenger.showSnackBar(
-      const SnackBar(content: Text('경로가 삭제되었습니다'), behavior: SnackBarBehavior.floating),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -154,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.white,
         title: Row(
           children: [
-            const Icon(Icons.explore, color: Color(0xFF4A90D9), size: 22),
+            const Icon(Icons.explore, color: Color(0xFF4F9D6E), size: 22),
             const SizedBox(width: 8),
             const Text('Tripia', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -165,17 +208,17 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: _checkingWeather
                   ? const SizedBox(
                       width: 18, height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4A90D9)),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F9D6E)),
                     )
                   : const Icon(Icons.cloud_sync_outlined),
               tooltip: '날씨 다시 확인',
               onPressed: _checkingWeather ? null : _manualWeatherCheck,
             ),
           GestureDetector(
-            onTap: () => context.push('/mypage'),
+            onTap: () => context.go('/mypage'),
             child: CircleAvatar(
               radius: 16,
-              backgroundColor: const Color(0xFF4A90D9),
+              backgroundColor: const Color(0xFF4F9D6E),
               child: Text(
                 _userName.isNotEmpty ? _userName[0] : '?',
                 style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
@@ -207,10 +250,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       }),
                     ),
                     const SizedBox(height: 20),
+                    _NearbyNowCard(
+                      city: _currentCity,
+                      weather: _currentWeather,
+                      loading: _generatingNearby,
+                      onTap: _generatingNearby ? null : _generateNearbyNow,
+                    ),
+                    const SizedBox(height: 20),
                     _NewTripCard(onTap: () async {
                       await context.push('/route/input');
                       _load();
                     }),
+                    const SizedBox(height: 24),
+                    _RecommendedTripsSection(
+                      loading: _loadingRecommendations,
+                      recommendations: _recommendations,
+                      onTapRecommendation: (rec) async {
+                        await context.push('/route/input', extra: {
+                          'destination': rec.destination,
+                          'days': rec.days,
+                        });
+                        _load();
+                      },
+                    ),
                     // 날씨 알림 카드
                     if (_weatherAlerts.isNotEmpty) ...[
                       const SizedBox(height: 20),
@@ -222,31 +284,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ],
-                    const SizedBox(height: 28),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '저장된 경로',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
-                        ),
-                        Text('${_trips.length}개', style: TextStyle(fontSize: 13, color: Colors.grey[500])),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    if (_trips.isEmpty)
-                      _EmptyRouteState()
-                    else
-                      ..._trips.map((trip) => _TripCard(
-                            trip: trip,
-                            hasAlert: _weatherAlerts.any((a) => a.trip.id == trip.id),
-                            onTap: () => context.push('/route/result', extra: {
-                              'destination': trip.plan.destination,
-                              'days': trip.plan.days,
-                              'tripPlan': trip.plan,
-                            }),
-                            onDelete: () => _delete(trip.id),
-                          )),
                   ],
                 ),
               ),
@@ -298,7 +335,7 @@ class _WeatherAlertCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '현재: ${alert.newWeather.summary}',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF4A90D9), fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF4F9D6E), fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
@@ -306,7 +343,7 @@ class _WeatherAlertCard extends StatelessWidget {
                   child: FilledButton(
                     onPressed: onReroute,
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF4A90D9),
+                      backgroundColor: const Color(0xFF4F9D6E),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
@@ -352,7 +389,7 @@ class _GreetingCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF4A90D9), Color(0xFF6BB3F0)],
+            colors: [Color(0xFF4F9D6E), Color(0xFF6BB3F0)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -440,6 +477,237 @@ class _GreetingCard extends StatelessWidget {
   }
 }
 
+// ─── AI 추천 여행지 섹션 ───────────────────────────────────────
+class _RecommendedTripsSection extends StatelessWidget {
+  final bool loading;
+  final List<DestinationRecommendation> recommendations;
+  final void Function(DestinationRecommendation) onTapRecommendation;
+
+  const _RecommendedTripsSection({
+    required this.loading,
+    required this.recommendations,
+    required this.onTapRecommendation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading) {
+      return const SizedBox(
+        height: 180,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (recommendations.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '취향에 맞는 추천 여행지',
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'AI가 회원님의 취향을 분석해 골랐어요',
+          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 200,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: recommendations.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, i) {
+              final r = recommendations[i];
+              return _RecommendationCard(
+                recommendation: r,
+                onTap: () => onTapRecommendation(r),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RecommendationCard extends StatelessWidget {
+  final DestinationRecommendation recommendation;
+  final VoidCallback onTap;
+
+  const _RecommendationCard({required this.recommendation, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final r = recommendation;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 160,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4))],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 90,
+              width: double.infinity,
+              child: r.photoUrl != null
+                  ? Image.network(
+                      r.photoUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _PhotoFallback(emoji: r.emoji),
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Container(
+                          color: const Color(0xFFF0F0F0),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 18, height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : _PhotoFallback(emoji: r.emoji),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    r.destination,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    r.reason,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500], height: 1.3),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '${r.days}박 ${r.days + 1}일 추천',
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF4F9D6E), fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PhotoFallback extends StatelessWidget {
+  final String emoji;
+  const _PhotoFallback({required this.emoji});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF4F9D6E), Color(0xFF6BB3F0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Center(
+        child: Text(emoji, style: const TextStyle(fontSize: 36)),
+      ),
+    );
+  }
+}
+
+// ─── 지금 갈 수 있는 근교 코스 카드 ──────────────────────────────
+class _NearbyNowCard extends StatelessWidget {
+  final String city;
+  final WeatherInfo? weather;
+  final bool loading;
+  final VoidCallback? onTap;
+
+  const _NearbyNowCard({
+    required this.city,
+    required this.weather,
+    required this.loading,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final subtitle = city.isEmpty
+        ? '위치 권한을 허용하면 현재 위치 기준으로 추천해드려요'
+        : '$city ${weather != null ? '· ${weather!.summary}' : ''} · 지금 바로 떠날 수 있는 코스를 AI가 짜드려요';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFF9966), Color(0xFFFF5E62)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, 4))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56, height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: loading
+                  ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                    )
+                  : const Icon(Icons.bolt, color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loading ? 'AI가 근교 코스를 짜고 있어요...' : '지금 갈 수 있는 근교 코스 추천',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.9)),
+                  ),
+                ],
+              ),
+            ),
+            if (!loading) const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _NewTripCard extends StatelessWidget {
   final VoidCallback onTap;
   const _NewTripCard({required this.onTap});
@@ -460,10 +728,10 @@ class _NewTripCard extends StatelessWidget {
             Container(
               width: 56, height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFF4A90D9).withValues(alpha: 0.1),
+                color: const Color(0xFF4F9D6E).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.add_location_alt_outlined, color: Color(0xFF4A90D9), size: 28),
+              child: const Icon(Icons.add_location_alt_outlined, color: Color(0xFF4F9D6E), size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -486,104 +754,3 @@ class _NewTripCard extends StatelessWidget {
   }
 }
 
-class _TripCard extends StatelessWidget {
-  final SavedTrip trip;
-  final bool hasAlert;
-  final VoidCallback onTap;
-  final VoidCallback onDelete;
-
-  const _TripCard({required this.trip, required this.hasAlert, required this.onTap, required this.onDelete});
-
-  String _formatDate(DateTime dt) =>
-      '${dt.year}.${dt.month.toString().padLeft(2, '0')}.${dt.day.toString().padLeft(2, '0')}';
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Dismissible(
-        key: Key(trip.id),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          decoration: BoxDecoration(color: Colors.red[400], borderRadius: BorderRadius.circular(16)),
-          child: const Icon(Icons.delete_outline, color: Colors.white, size: 26),
-        ),
-        onDismissed: (_) => onDelete(),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: hasAlert ? Border.all(color: const Color(0xFFFFD54F), width: 1.5) : null,
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2))],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48, height: 48,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4A90D9).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: const Icon(Icons.flight_takeoff_rounded, color: Color(0xFF4A90D9), size: 24),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(trip.plan.destination,
-                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
-                          if (hasAlert) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(color: const Color(0xFFFFD54F), borderRadius: BorderRadius.circular(6)),
-                              child: const Text('날씨변화', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF795548))),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${trip.plan.days}박 ${trip.plan.days + 1}일 • ${_formatDate(trip.savedAt)} 저장',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyRouteState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 40),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        children: [
-          Icon(Icons.map_outlined, size: 48, color: Colors.grey[300]),
-          const SizedBox(height: 12),
-          Text('저장된 경로가 없습니다', style: TextStyle(fontSize: 14, color: Colors.grey[400], fontWeight: FontWeight.w500)),
-          const SizedBox(height: 4),
-          Text('위 버튼으로 첫 번째 경로를 만들어보세요', style: TextStyle(fontSize: 12, color: Colors.grey[400])),
-        ],
-      ),
-    );
-  }
-}

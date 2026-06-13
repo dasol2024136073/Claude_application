@@ -16,7 +16,7 @@ class _MapScreenState extends State<MapScreen> {
   int _selectedDay = 0; // 0 = 전체
 
   static const _dayColors = [
-    Color(0xFF4A90D9),
+    Color(0xFF4F9D6E),
     Color(0xFFE8734A),
     Color(0xFF22C55E),
     Color(0xFF8B5CF6),

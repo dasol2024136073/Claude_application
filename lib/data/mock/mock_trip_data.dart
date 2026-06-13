@@ -37,7 +37,7 @@ class MockTripData {
             PlaceItem(time: '09:00', name: '유니버설 스튜디오 재팬', category: '테마파크', description: '해리포터, 슈퍼닌텐도 월드 — 반일 코스 추천', latitude: 34.6654, longitude: 135.4323),
             PlaceItem(time: '16:00', name: '린쿠 프리미엄 아웃렛', category: '쇼핑', description: '공항 근처 아웃렛, 출국 전 마지막 쇼핑 기회', latitude: 34.4378, longitude: 135.3157),
           ]),
-        ].take(days).toList(),
+        ].take(days + 1).toList(),
       );
 
   static TripPlan _jeju(int days) => TripPlan(
@@ -61,7 +61,7 @@ class MockTripData {
             PlaceItem(time: '14:00', name: '천지연 폭포', category: '자연', description: '22m 높이 폭포, 밤에 조명이 아름다운 명소', latitude: 33.2508, longitude: 126.5595),
             PlaceItem(time: '16:30', name: '애월 해안도로 드라이브', category: '자연', description: '제주 서쪽 카페 로드, 한담해변 석양이 압권', latitude: 33.4632, longitude: 126.3162),
           ]),
-        ].take(days).toList(),
+        ].take(days + 1).toList(),
       );
 
   static TripPlan _tokyo(int days) => TripPlan(
@@ -86,7 +86,7 @@ class MockTripData {
             PlaceItem(time: '16:00', name: '도쿄 도청 전망대', category: '전망대', description: '무료 전망대에서 날씨 좋으면 후지산도 보임', latitude: 35.6896, longitude: 139.6921),
             PlaceItem(time: '19:00', name: '오오쿠보 코리아타운', category: '맛집', description: '삼겹살과 치즈 닭갈비, 한국 음식이 그리울 때', latitude: 35.7017, longitude: 139.6993),
           ]),
-        ].take(days).toList(),
+        ].take(days + 1).toList(),
       );
 
   static TripPlan _paris(int days) => TripPlan(
@@ -104,11 +104,11 @@ class MockTripData {
             PlaceItem(time: '15:00', name: '마레 지구 산책', category: '쇼핑', description: '피카소 미술관, 빈티지샵, 팔라펠 맛집이 밀집', latitude: 48.8566, longitude: 2.3590),
             PlaceItem(time: '19:00', name: '센 강 유람선 석식', category: '관광·맛집', description: '바토무슈 2시간 크루즈, 일몰과 야경을 동시에', latitude: 48.8600, longitude: 2.3050),
           ]),
-        ].take(days).toList(),
+        ].take(days + 1).toList(),
       );
 
   static TripPlan _generic(String destination, int days) {
-    final List<DayPlan> plans = List.generate(days, (i) {
+    final List<DayPlan> plans = List.generate(days + 1, (i) {
       return DayPlan(day: i + 1, places: [
         PlaceItem(time: '09:30', name: '$destination 대표 명소', category: '관광', description: 'AI가 취향 프로필을 분석해 선택한 핵심 스팟'),
         PlaceItem(time: '12:30', name: '현지 맛집 점심', category: '맛집', description: '구글 리뷰 4.5 이상, 현지인이 즐겨 찾는 숨은 맛집'),

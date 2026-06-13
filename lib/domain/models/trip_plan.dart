@@ -2,17 +2,32 @@ class TripPlan {
   final String destination;
   final int days;
   final List<DayPlan> dayPlans;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final String? arrivalTime; // "HH:mm"
+  final String? departureTime; // "HH:mm"
+  final String? accommodation;
 
   const TripPlan({
     required this.destination,
     required this.days,
     required this.dayPlans,
+    this.startDate,
+    this.endDate,
+    this.arrivalTime,
+    this.departureTime,
+    this.accommodation,
   });
 
   Map<String, dynamic> toJson() => {
         'destination': destination,
         'days': days,
         'dayPlans': dayPlans.map((d) => d.toJson()).toList(),
+        if (startDate != null) 'startDate': startDate!.toIso8601String(),
+        if (endDate != null) 'endDate': endDate!.toIso8601String(),
+        if (arrivalTime != null) 'arrivalTime': arrivalTime,
+        if (departureTime != null) 'departureTime': departureTime,
+        if (accommodation != null) 'accommodation': accommodation,
       };
 
   factory TripPlan.fromJson(Map<String, dynamic> json) => TripPlan(
@@ -21,6 +36,11 @@ class TripPlan {
         dayPlans: (json['dayPlans'] as List<dynamic>)
             .map((d) => DayPlan.fromJson(d as Map<String, dynamic>))
             .toList(),
+        startDate: json['startDate'] != null ? DateTime.parse(json['startDate'] as String) : null,
+        endDate: json['endDate'] != null ? DateTime.parse(json['endDate'] as String) : null,
+        arrivalTime: json['arrivalTime'] as String?,
+        departureTime: json['departureTime'] as String?,
+        accommodation: json['accommodation'] as String?,
       );
 }
 

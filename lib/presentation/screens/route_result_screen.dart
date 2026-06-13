@@ -10,6 +10,7 @@ class RouteResultScreen extends StatefulWidget {
   final int days;
   final TripPlan? tripPlan;
   final WeatherInfo? weather;
+  final String? tripId;
 
   const RouteResultScreen({
     super.key,
@@ -17,6 +18,7 @@ class RouteResultScreen extends StatefulWidget {
     required this.days,
     this.tripPlan,
     this.weather,
+    this.tripId,
   });
 
   @override
@@ -28,7 +30,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
   bool _saving = false;
 
   static const _categoryColors = {
-    '관광': Color(0xFF4A90D9),
+    '관광': Color(0xFF4F9D6E),
     '맛집': Color(0xFFE8734A),
     '맛집·관광': Color(0xFFE8734A),
     '맛집·카페': Color(0xFFE8734A),
@@ -51,6 +53,31 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       if (category.contains(entry.key)) return entry.value;
     }
     return const Color(0xFF64748B);
+  }
+
+  bool _unsaving = false;
+
+  Future<void> _unsavePlan() async {
+    final tripId = widget.tripId;
+    if (tripId == null) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('저장 취소'),
+        content: const Text('저장된 경로를 삭제하시겠습니까?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _unsaving = true);
+    await TripRepository.deleteCascade(tripId);
+    if (!mounted) return;
+    context.pop();
   }
 
   Future<void> _savePlan(TripPlan plan) async {
@@ -113,6 +140,7 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
       body: Column(
         children: [
           _AiBadgeBar(weather: widget.weather),
+          _TripInfoBar(plan: plan),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(20),
@@ -125,11 +153,13 @@ class _RouteResultScreenState extends State<RouteResultScreen> {
               },
             ),
           ),
-          _SaveBar(
-            saved: _saved,
-            saving: _saving,
-            onSave: () => _savePlan(plan),
-          ),
+          widget.tripId != null
+              ? _UnsaveBar(unsaving: _unsaving, onUnsave: _unsavePlan)
+              : _SaveBar(
+                  saved: _saved,
+                  saving: _saving,
+                  onSave: () => _savePlan(plan),
+                ),
         ],
       ),
     );
@@ -151,7 +181,7 @@ class _AiBadgeBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A90D9),
+              color: const Color(0xFF4F9D6E),
               borderRadius: BorderRadius.circular(6),
             ),
             child: const Text('AI 생성', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
@@ -178,6 +208,66 @@ class _AiBadgeBar extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TripInfoBar extends StatelessWidget {
+  final TripPlan plan;
+  const _TripInfoBar({required this.plan});
+
+  String _formatDate(DateTime d) => '${d.year}.${d.month.toString().padLeft(2, '0')}.${d.day.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context) {
+    final chips = <Widget>[];
+
+    if (plan.startDate != null && plan.endDate != null) {
+      chips.add(_InfoChip(icon: Icons.date_range, label: '${_formatDate(plan.startDate!)} ~ ${_formatDate(plan.endDate!)}'));
+    }
+    if (plan.arrivalTime != null) {
+      chips.add(_InfoChip(icon: Icons.flight_land, label: '입국 ${plan.arrivalTime}'));
+    }
+    if (plan.departureTime != null) {
+      chips.add(_InfoChip(icon: Icons.flight_takeoff, label: '출국 ${plan.departureTime}'));
+    }
+    if (plan.accommodation != null) {
+      chips.add(_InfoChip(icon: Icons.hotel, label: plan.accommodation!));
+    }
+
+    if (chips.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+      color: Colors.white,
+      child: Wrap(spacing: 8, runSpacing: 8, children: chips),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFE8E8E8)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: const Color(0xFF4F9D6E)),
+          const SizedBox(width: 5),
+          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
         ],
       ),
     );
@@ -268,7 +358,7 @@ class _PlaceRow extends StatelessWidget {
                 children: [
                   Text(
                     place.time,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF4A90D9)),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF4F9D6E)),
                   ),
                   const SizedBox(height: 4),
                   Container(
@@ -373,7 +463,54 @@ class _SaveBar extends StatelessWidget {
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           style: FilledButton.styleFrom(
-            backgroundColor: saved ? Colors.grey[400] : const Color(0xFF4A90D9),
+            backgroundColor: saved ? Colors.grey[400] : const Color(0xFF4F9D6E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UnsaveBar extends StatelessWidget {
+  final bool unsaving;
+  final VoidCallback onUnsave;
+
+  const _UnsaveBar({required this.unsaving, required this.onUnsave});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: OutlinedButton.icon(
+          onPressed: unsaving ? null : onUnsave,
+          icon: unsaving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                )
+              : const Icon(Icons.bookmark_remove_outlined),
+          label: Text(
+            unsaving ? '삭제 중...' : '저장 취소',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          ),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.red[400],
+            side: BorderSide(color: Colors.red[200]!),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
         ),

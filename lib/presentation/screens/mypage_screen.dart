@@ -28,6 +28,11 @@ class _MyPageScreenState extends State<MyPageScreen> {
     });
   }
 
+  Future<void> _editProfile() async {
+    final result = await context.push('/mypage/profile-edit', extra: _user);
+    if (result == true) _load();
+  }
+
   Future<void> _changePassword() async {
     final currentCtrl = TextEditingController();
     final newCtrl = TextEditingController();
@@ -89,7 +94,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   setDialogState(() => errorMsg = result.error);
                 }
               },
-              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF4A90D9)),
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFF4F9D6E)),
               child: const Text('변경'),
             ),
           ],
@@ -125,6 +130,60 @@ class _MyPageScreenState extends State<MyPageScreen> {
     }
   }
 
+  Future<void> _deleteAccount() async {
+    final passwordCtrl = TextEditingController();
+    String? errorMsg;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('계정 삭제', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('계정을 삭제하면 되돌릴 수 없습니다.\n계속하려면 비밀번호를 입력해주세요.'),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: '비밀번호', border: OutlineInputBorder()),
+              ),
+              if (errorMsg != null) ...[
+                const SizedBox(height: 10),
+                Text(errorMsg!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+            FilledButton(
+              onPressed: () async {
+                final result = await AuthService.deleteAccount(passwordCtrl.text);
+                if (!ctx.mounted) return;
+                if (result.success) {
+                  Navigator.pop(ctx, true);
+                } else {
+                  setDialogState(() => errorMsg = result.error);
+                }
+              },
+              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('삭제'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    passwordCtrl.dispose();
+
+    if (confirmed == true) {
+      if (!mounted) return;
+      context.go('/');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,10 +191,6 @@ class _MyPageScreenState extends State<MyPageScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text('마이페이지', style: TextStyle(fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-          onPressed: () => context.pop(),
-        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -145,14 +200,94 @@ class _MyPageScreenState extends State<MyPageScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 12),
-                      _ProfileHeader(user: _user!),
-                      const SizedBox(height: 24),
-                      _InfoCard(user: _user!),
-                      const SizedBox(height: 24),
-                      _ChangePasswordButton(onTap: _changePassword),
-                      const SizedBox(height: 12),
-                      _LogoutButton(onTap: _logout),
+                      _ProfileCard(user: _user!, onTap: _editProfile),
+                      const SizedBox(height: 20),
+                      _SectionLabel('나의 활동'),
+                      _GroupCard(rows: [
+                        _MenuRow(
+                          icon: Icons.map_outlined,
+                          label: '내가 저장한 경로',
+                          onTap: () => context.go('/my-routes'),
+                        ),
+                        _MenuRow(
+                          icon: Icons.article_outlined,
+                          label: '내가 작성한 게시물·댓글',
+                          onTap: () => context.push('/mypage/my-posts', extra: _user!['email']),
+                        ),
+                        _MenuRow(
+                          icon: Icons.favorite_border,
+                          label: '좋아요 누른 게시물·댓글',
+                          onTap: () => context.push('/mypage/liked-posts', extra: _user!['email']),
+                        ),
+                        _MenuRow(
+                          icon: Icons.tune,
+                          label: '여행 취향 설정',
+                          onTap: () async {
+                            final result = await context.push('/onboarding', extra: _user);
+                            if (result == true) _load();
+                          },
+                        ),
+                      ]),
+                      const SizedBox(height: 20),
+                      _SectionLabel('설정'),
+                      _GroupCard(rows: [
+                        _MenuRow(
+                          icon: Icons.notifications_outlined,
+                          label: '알림 설정',
+                          onTap: () => context.push('/mypage/notifications'),
+                        ),
+                        _MenuRow(
+                          icon: Icons.settings_outlined,
+                          label: '앱 설정',
+                          onTap: () => context.push('/mypage/app-settings'),
+                        ),
+                        _MenuRow(
+                          icon: Icons.lock_outline,
+                          label: '비밀번호 변경',
+                          onTap: _changePassword,
+                        ),
+                      ]),
+                      const SizedBox(height: 20),
+                      _SectionLabel('정보'),
+                      _GroupCard(rows: [
+                        _MenuRow(
+                          icon: Icons.badge_outlined,
+                          label: '내 개인정보',
+                          onTap: () => context.push('/mypage/personal-info', extra: _user!),
+                        ),
+                        _MenuRow(
+                          icon: Icons.campaign_outlined,
+                          label: '공지사항',
+                          onTap: () => context.push('/mypage/notice'),
+                        ),
+                        _MenuRow(
+                          icon: Icons.description_outlined,
+                          label: '이용약관',
+                          onTap: () => context.push('/mypage/terms'),
+                        ),
+                        _MenuRow(
+                          icon: Icons.privacy_tip_outlined,
+                          label: '개인정보처리방침',
+                          onTap: () => context.push('/mypage/privacy'),
+                        ),
+                      ]),
+                      const SizedBox(height: 20),
+                      _SectionLabel('계정'),
+                      _GroupCard(rows: [
+                        _MenuRow(
+                          icon: Icons.logout,
+                          label: '로그아웃',
+                          onTap: _logout,
+                        ),
+                        _MenuRow(
+                          icon: Icons.person_remove_outlined,
+                          label: '계정 삭제',
+                          labelColor: Colors.red,
+                          iconColor: Colors.red,
+                          onTap: _deleteAccount,
+                        ),
+                      ]),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -160,68 +295,90 @@ class _MyPageScreenState extends State<MyPageScreen> {
   }
 }
 
-class _ProfileHeader extends StatelessWidget {
+class _ProfileCard extends StatelessWidget {
   final Map<String, dynamic> user;
-  const _ProfileHeader({required this.user});
+  final VoidCallback onTap;
+  const _ProfileCard({required this.user, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final name = (user['name'] as String? ?? '').trim();
     final initial = name.isNotEmpty ? name[0] : '?';
 
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 44,
-          backgroundColor: const Color(0xFF4A90D9),
-          child: Text(
-            initial,
-            style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold),
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2)),
+          ],
         ),
-        const SizedBox(height: 14),
-        Text(
-          name,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 32,
+              backgroundColor: const Color(0xFF4F9D6E),
+              child: Text(
+                initial,
+                style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user['email'] as String? ?? '',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.grey[400]),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          user['email'] as String? ?? '',
-          style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _InfoCard extends StatelessWidget {
-  final Map<String, dynamic> user;
-  const _InfoCard({required this.user});
+class _SectionLabel extends StatelessWidget {
+  final String text;
+  const _SectionLabel(this.text);
 
   @override
   Widget build(BuildContext context) {
-    final rows = <_InfoRow>[];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey[500]),
+        ),
+      ),
+    );
+  }
+}
 
-    final gender = user['gender'] as String?;
-    if (gender != null && gender.isNotEmpty) {
-      rows.add(_InfoRow(icon: Icons.person_outline, label: '성별', value: gender));
-    }
+class _GroupCard extends StatelessWidget {
+  final List<_MenuRow> rows;
+  const _GroupCard({required this.rows});
 
-    final phone = user['phone'] as String?;
-    if (phone != null && phone.isNotEmpty) {
-      rows.add(_InfoRow(icon: Icons.phone_outlined, label: '전화번호', value: phone));
-    }
-
-    final birth = user['birthDate'] as String?;
-    if (birth != null && birth.isNotEmpty) {
-      rows.add(_InfoRow(icon: Icons.cake_outlined, label: '생년월일', value: birth));
-    }
-
-    if (rows.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
+  @override
+  Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -242,69 +399,39 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-class _InfoRow extends StatelessWidget {
+class _MenuRow extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String value;
-  const _InfoRow({required this.icon, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          Icon(icon, size: 22, color: const Color(0xFF4A90D9)),
-          const SizedBox(width: 16),
-          Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
-          const Spacer(),
-          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
-        ],
-      ),
-    );
-  }
-}
-
-class _ChangePasswordButton extends StatelessWidget {
   final VoidCallback onTap;
-  const _ChangePasswordButton({required this.onTap});
+  final Color? labelColor;
+  final Color? iconColor;
+
+  const _MenuRow({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.labelColor,
+    this.iconColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: const Icon(Icons.lock_outline, size: 18),
-        label: const Text('비밀번호 변경'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF4A90D9),
-          side: const BorderSide(color: Color(0xFF4A90D9)),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-    );
-  }
-}
-
-class _LogoutButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _LogoutButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: const Icon(Icons.logout, size: 18),
-        label: const Text('로그아웃'),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.red,
-          side: const BorderSide(color: Colors.red),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: iconColor ?? const Color(0xFF4F9D6E)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: labelColor ?? const Color(0xFF1A1A2E)),
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.grey[400]),
+          ],
         ),
       ),
     );
