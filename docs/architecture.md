@@ -48,7 +48,7 @@ lib/
 ├── domain/
 │   └── models/
 │       ├── trip_plan.dart                 # TripPlan / DayPlan / PlaceItem
-│       ├── community_post.dart            # CommunityPost (게시글, 좋아요/북마크)
+│       ├── community_post.dart            # CommunityPost (게시글, 카테고리: 경로공유/질문/자유, 좋아요)
 │       ├── community_comment.dart         # CommunityComment (댓글)
 │       ├── review.dart                    # Review (경로 후기)
 │       └── destination_recommendation.dart # DestinationRecommendation (AI 추천 여행지)
@@ -63,7 +63,7 @@ lib/
 │       ├── recommendation_repository.dart # 추천 여행지 캐싱 (24시간)
 │       ├── trip_repository.dart           # 경로 저장·조회·삭제
 │       ├── trip_events.dart               # 경로/후기 변경 알림 이벤트 버스
-│       ├── community_repository.dart      # 커뮤니티 게시글 저장·조회·좋아요·북마크
+│       ├── community_repository.dart      # 커뮤니티 게시글 저장·조회·좋아요
 │       ├── community_comment_repository.dart # 커뮤니티 댓글 저장·조회·삭제
 │       ├── community_events.dart          # 커뮤니티 변경 알림 이벤트 버스
 │       ├── review_repository.dart         # 경로 후기 저장·조회·삭제
@@ -156,7 +156,7 @@ flowchart TD
 | 실시간 날씨 반영 추천 | `HomeScreen`, `RouteResultScreen` | - | `WeatherService` → Gemini 프롬프트 조정 |
 | 날씨 변화 감지 재추천 (저장된 경로) | (백그라운드) | - | `WeatherMonitorService` (Timer, 30분 주기 + 5초 데모 체크) |
 | 날씨 검색 | `WeatherScreen` | - | `WeatherService` |
-| 커뮤니티 게시글/댓글/좋아요/북마크 | `CommunityScreen`, `PostDetailScreen`, `PostEditorScreen`, `MyPostsScreen`, `LikedPostsScreen` | `CommunityPost`, `CommunityComment` | `CommunityRepository`, `CommunityCommentRepository` (SharedPreferences) + `CommunityEvents` |
+| 커뮤니티 게시글/댓글(대댓글)/좋아요 | `CommunityScreen`, `PostDetailScreen`, `PostEditorScreen`, `MyPostsScreen`, `LikedPostsScreen` | `CommunityPost`(카테고리: 경로공유/질문/자유), `CommunityComment` | `CommunityRepository`, `CommunityCommentRepository` (SharedPreferences) + `CommunityEvents` |
 | 로그인/회원가입/마이페이지/취향 프로필 | `LoginScreen`, `SignupScreen`, `OnboardingScreen`, `MyPageScreen`, `ProfileEditScreen`, `PersonalInfoScreen` | - | `AuthService` (SharedPreferences) |
 
 ---
@@ -218,7 +218,7 @@ key: "users"                       → [ { name, email, password, gender, phone,
 key: "currentUser"                 → { name, email }
 key: "saved_trips"                 → [ TripPlan.toJson() + { id, ... }, ... ]
 key: "trip_reviews"                → [ Review.toJson(), ... ]
-key: "community_posts"             → [ CommunityPost.toJson() (좋아요/북마크 포함), ... ]
+key: "community_posts"             → [ CommunityPost.toJson() (카테고리: 경로공유/질문/자유, 좋아요 포함), ... ]
 key: "community_comments"          → [ CommunityComment.toJson(), ... ]
 key: "destination_recommendations" → [ DestinationRecommendation.toJson(), ... ]  (+ 캐싱 시각 별도 키)
 ```
