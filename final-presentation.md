@@ -378,35 +378,33 @@ GoRouter로 8개 경로를 관리합니다.
 
 ## <span class="chnum">02</span> 구현 방법 — 핵심 기능 5가지
 
-<div class="cards" style="grid-template-columns: repeat(3, 1fr);">
+<div class="cards compact" style="grid-template-columns: repeat(3, 1fr);">
 <div class="card good">
-<div class="icon">🎯</div>
-<h3>취향 기반 개인화 추천</h3>
-<p>온보딩 취향 5종 선택 → 홈에 Gemini가 나라별 추천 카드 생성, 경로 검색 시 저장된 취향을 기본 필터로 자동 적용</p>
-</div>
-<div class="card good">
-<div class="icon">🤖</div>
-<h3>AI 경로 생성</h3>
-<p>취향+날씨 컨텍스트를 Gemini 2.5 Flash에 전달, <code>_extractJson()</code>으로 마크다운 방어 파싱</p>
+<div class="icon" style="font-size: 1.4em; margin-bottom: 2px;">🎯</div>
+<h3 style="margin-bottom: 2px;">취향 기반 개인화 추천</h3>
+<p style="font-size: 0.85em; line-height: 1.35;">온보딩 취향 5종 → 홈 추천 카드 생성, 경로 검색 시 기본 필터로 자동 적용</p>
 </div>
 <div class="card good">
-<div class="icon">🌦️</div>
-<h3>실시간 날씨 반영</h3>
-<p>OpenWeatherMap → 60+ 도시 매핑, 홈에서 "날씨 다시 확인" 클릭 시 저장 경로 날씨를 재확인해 실내·실외 재추천</p>
+<div class="icon" style="font-size: 1.4em; margin-bottom: 2px;">🤖</div>
+<h3 style="margin-bottom: 2px;">AI 경로 생성</h3>
+<p style="font-size: 0.85em; line-height: 1.35;">취향+날씨를 Gemini 2.5 Flash에 전달, <code>_extractJson()</code>으로 마크다운 방어 파싱</p>
 </div>
 <div class="card good">
-<div class="icon">🗺️</div>
-<h3>지도 시각화</h3>
-<p>flutter_map + OpenStreetMap, 번호 마커 + 폴리라인으로 동선 표시 (API 키 불필요)</p>
+<div class="icon" style="font-size: 1.4em; margin-bottom: 2px;">🌦️</div>
+<h3 style="margin-bottom: 2px;">실시간 날씨 반영</h3>
+<p style="font-size: 0.85em; line-height: 1.35;">60+ 도시 매핑, "날씨 다시 확인" 클릭 시 저장 경로 재추천(실내·실외)</p>
 </div>
 <div class="card good">
-<div class="icon">👥</div>
-<h3>커뮤니티</h3>
-<p>경로 공유·질문·자유 게시판 + 댓글(대댓글)·좋아요·북마크로 다른 사용자 여행 경로 참고</p>
+<div class="icon" style="font-size: 1.4em; margin-bottom: 2px;">🗺️</div>
+<h3 style="margin-bottom: 2px;">지도 시각화</h3>
+<p style="font-size: 0.85em; line-height: 1.35;">flutter_map + OpenStreetMap, 번호 마커+폴리라인 (API 키 불필요)</p>
+</div>
+<div class="card good">
+<div class="icon" style="font-size: 1.4em; margin-bottom: 2px;">👥</div>
+<h3 style="margin-bottom: 2px;">커뮤니티</h3>
+<p style="font-size: 0.85em; line-height: 1.35;">경로공유·질문·자유 게시판 + 댓글·좋아요·북마크로 다른 사용자 경로 참고</p>
 </div>
 </div>
-
-<br>
 
 > 다섯 기능 모두 **API 키 2개(Gemini, OpenWeatherMap)** + Unsplash(선택) 만으로 동작 — 발표 데모 환경 이식성 확보
 
