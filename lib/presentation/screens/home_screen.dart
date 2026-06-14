@@ -37,12 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _load();
   }
 
-  @override
-  void dispose() {
-    WeatherMonitorService.stopMonitoring();
-    super.dispose();
-  }
-
   Future<void> _load() async {
     final user = await AuthService.getCurrentUser();
     final trips = await TripRepository.getAll();
@@ -52,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
       _trips = trips;
       _loading = false;
     });
-    _startWeatherMonitoring(trips);
     _loadCurrentWeather();
     _loadRecommendations();
   }
@@ -126,14 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'days': 0,
       'tripPlan': plan,
       'weather': _currentWeather,
-    });
-  }
-
-  void _startWeatherMonitoring(List<SavedTrip> trips) {
-    if (trips.isEmpty) return;
-    WeatherMonitorService.startMonitoring(trips, (alerts) {
-      if (!mounted) return;
-      setState(() => _weatherAlerts = alerts);
     });
   }
 

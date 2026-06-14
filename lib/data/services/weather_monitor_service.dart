@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'trip_repository.dart';
 import 'weather_service.dart';
 
@@ -15,8 +14,6 @@ class WeatherAlert {
 }
 
 class WeatherMonitorService {
-  static Timer? _timer;
-
   // 날씨가 유의미하게 바뀌었는지 판단
   static bool isSignificantChange(String? original, String current) {
     if (original == null) return false;
@@ -53,27 +50,5 @@ class WeatherMonitorService {
       }
     }
     return alerts;
-  }
-
-  // 30분마다 자동 체크 시작
-  static void startMonitoring(
-    List<SavedTrip> trips,
-    void Function(List<WeatherAlert>) onAlertsUpdated,
-  ) {
-    _timer?.cancel();
-    // 앱 로드 후 5초 뒤 첫 체크 (데모용), 이후 30분마다
-    Timer(const Duration(seconds: 5), () async {
-      final alerts = await checkAll(trips);
-      onAlertsUpdated(alerts);
-    });
-    _timer = Timer.periodic(const Duration(minutes: 30), (_) async {
-      final alerts = await checkAll(trips);
-      onAlertsUpdated(alerts);
-    });
-  }
-
-  static void stopMonitoring() {
-    _timer?.cancel();
-    _timer = null;
   }
 }

@@ -58,7 +58,7 @@ lib/
 │   └── services/
 │       ├── gemini_service.dart            # Gemini 2.5 Flash 연동, JSON 추출, 경로 생성/추천
 │       ├── weather_service.dart           # OpenWeatherMap, 60+ 도시 매핑
-│       ├── weather_monitor_service.dart   # 5초 후 즉시 + 30분 주기 날씨 변화 감지
+│       ├── weather_monitor_service.dart   # 저장된 경로 날씨 변화 수동 재확인
 │       ├── photo_service.dart             # Unsplash 사진 검색
 │       ├── recommendation_repository.dart # 추천 여행지 캐싱 (24시간)
 │       ├── trip_repository.dart           # 경로 저장·조회·삭제
@@ -131,7 +131,7 @@ flowchart TD
     K --> MR
     MR --> RV[후기 작성/보기]
     D --> W[날씨 검색 화면<br/>시간별·5일 예보]
-    D -. 30분 주기 .-> WM[저장된 경로 날씨 변화 감지]
+    D -. 날씨 다시 확인 버튼 .-> WM[저장된 경로 날씨 변화 감지]
     WM -. 알림 .-> MR
 
     CM --> PD[게시글 상세 + 댓글]
@@ -154,7 +154,7 @@ flowchart TD
 | 경로 후기 작성/조회 | `ReviewEditorScreen`, `ReviewViewScreen`, `MyRoutesScreen` | `Review` | `ReviewRepository` (SharedPreferences) |
 | 지도 시각화 | `MapScreen` | `PlaceItem` (lat/lng) | flutter_map + OpenStreetMap |
 | 실시간 날씨 반영 추천 | `HomeScreen`, `RouteResultScreen` | - | `WeatherService` → Gemini 프롬프트 조정 |
-| 날씨 변화 감지 재추천 (저장된 경로) | (백그라운드) | - | `WeatherMonitorService` (Timer, 30분 주기 + 5초 데모 체크) |
+| 날씨 변화 감지 재추천 (저장된 경로) | `HomeScreen` ("날씨 다시 확인" 버튼) | - | `WeatherMonitorService.checkAll()` (수동 호출) |
 | 날씨 검색 | `WeatherScreen` | - | `WeatherService` |
 | 커뮤니티 게시글/댓글(대댓글)/좋아요 | `CommunityScreen`, `PostDetailScreen`, `PostEditorScreen`, `MyPostsScreen`, `LikedPostsScreen` | `CommunityPost`(카테고리: 경로공유/질문/자유), `CommunityComment` | `CommunityRepository`, `CommunityCommentRepository` (SharedPreferences) + `CommunityEvents` |
 | 로그인/회원가입/마이페이지/취향 프로필 | `LoginScreen`, `SignupScreen`, `OnboardingScreen`, `MyPageScreen`, `ProfileEditScreen`, `PersonalInfoScreen` | - | `AuthService` (SharedPreferences) |
