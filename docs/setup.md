@@ -33,48 +33,48 @@ flutter pub get
 
 ---
 
-## 3단계 — 환경 변수 설정
+## 3단계 — API 키 설정
 
-Firebase와 API 키는 `.env` 파일로 관리합니다. (현재 Hello World 단계는 불필요)
+API 키는 `.env` 대신 **`lib/core/config.dart`** 파일로 관리합니다 (Flutter Web에서 `dotenv` 로딩 이슈를 피하기 위한 선택).
 
 ```bash
-# .env.example을 복사해서 .env 생성
-cp .env.example .env
+# 템플릿을 복사해서 config.dart 생성
+cp lib/core/config.example.dart lib/core/config.dart
 ```
 
-`.env` 파일에 아래 값을 채워넣으세요.
+`lib/core/config.dart` 파일에 아래 값을 채워넣으세요.
 
-```
-# Firebase (12주차 설정 후 추가)
-FIREBASE_PROJECT_ID=
-
-# API Keys (12주차 이후 추가)
-GOOGLE_MAPS_API_KEY=
-OPENWEATHER_API_KEY=
-CLAUDE_API_KEY=
+```dart
+const geminiApiKey = 'YOUR_GEMINI_API_KEY_HERE';
+const openWeatherApiKey = 'YOUR_OPENWEATHER_API_KEY_HERE';
 ```
 
-> `.env` 파일은 `.gitignore`에 포함되어 있어 절대 커밋되지 않습니다.
+| 키 | 용도 | 발급처 |
+|---|---|---|
+| `geminiApiKey` | AI 여행 경로 생성 (Gemini 2.5 Flash) | Google AI Studio |
+| `openWeatherApiKey` | 실시간 날씨/예보 조회 | OpenWeatherMap |
+
+> `lib/core/config.dart`는 `.gitignore`에 포함되어 있어 절대 커밋되지 않습니다. 템플릿인 `config.example.dart`만 저장소에 포함됩니다.
 
 ---
 
-## 4단계 — 에뮬레이터 실행 확인
+## 4단계 — 실행 디바이스 확인
 
 ```bash
 flutter devices
 ```
 
-사용 가능한 디바이스 목록이 나와야 합니다. 없으면 Android Studio에서 에뮬레이터를 먼저 시작하세요.
+본 프로젝트는 **Flutter Web(Chrome) 우선 개발**이므로 Chrome이 목록에 있으면 충분합니다. Android 에뮬레이터로 실행하려면 Android Studio에서 AVD를 먼저 시작하세요.
 
 ---
 
 ## 5단계 — 앱 실행
 
 ```bash
-flutter run
+flutter run -d chrome
 ```
 
-Google / Kakao 소셜 로그인 버튼이 있는 화면이 보이면 성공입니다.
+이메일/비밀번호 로그인 화면(Tripia)이 보이면 성공입니다. 계정이 없다면 회원가입 화면에서 새 계정을 만들 수 있습니다.
 
 ### 특정 디바이스 지정
 
@@ -133,3 +133,6 @@ flutter run
 ```bash
 flutter pub upgrade
 ```
+
+**Q6. `Target of URI doesn't exist: '../../core/config.dart'` 에러가 날 때**
+`lib/core/config.dart` 파일이 없는 상태입니다. 3단계대로 `config.example.dart`를 복사해 `config.dart`를 생성하고 API 키를 채워주세요.
