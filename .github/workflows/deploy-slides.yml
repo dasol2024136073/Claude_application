@@ -33,6 +33,8 @@ jobs:
           mkdir -p dist
           marp final-presentation.md --html --output dist/index.html
           marp midterm-presentation.md --html --output dist/midterm.html
+          mkdir -p dist/docs/media
+          cp docs/media/demo.mp4 dist/docs/media/
           touch dist/.nojekyll
 
       - name: Upload artifact

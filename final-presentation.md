@@ -667,6 +667,8 @@ AUTHORING.임다솔.v0.4.0.md 한 파일에 Skills, Rules, Commands를 통합해
 
 # 🎬 시연 데모
 
+### <a href="docs/media/demo.mp4" target="_blank">▶ 시연 영상 보기 (mp4, 새 탭에서 열림)</a>
+
 ### 사용자 시나리오: "제주 2박 3일, 비 오면 실내로, 커뮤니티 공유"
 
 1. 로그인 → 홈 (현재 위치 날씨 카드)
