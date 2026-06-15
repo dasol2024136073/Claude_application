@@ -4,14 +4,14 @@ import 'package:travel_ai/data/mock/mock_trip_data.dart';
 
 void main() {
   group('MockTripData — 경계값', () {
-    test('days=0이면 dayPlans가 비어있다', () {
+    test('days=0(당일치기)이면 dayPlans가 1개다', () {
       final plan = MockTripData.generate('오사카', 0);
-      expect(plan.dayPlans, isEmpty);
+      expect(plan.dayPlans.length, 1);
     });
 
-    test('days=1이면 dayPlans가 정확히 1개다', () {
+    test('days=1(1박2일)이면 dayPlans가 정확히 2개다', () {
       final plan = MockTripData.generate('도쿄', 1);
-      expect(plan.dayPlans.length, 1);
+      expect(plan.dayPlans.length, 2);
     });
 
     test('저장된 일수(3일)를 초과 요청해도 최대 보유 일수까지만 반환한다', () {
@@ -20,10 +20,10 @@ void main() {
       expect(plan.dayPlans.length, lessThanOrEqualTo(3));
     });
 
-    test('알 수 없는 목적지는 generic 플랜으로 처리된다', () {
+    test('알 수 없는 목적지는 generic 플랜으로 처리된다 (3박4일)', () {
       final plan = MockTripData.generate('뉴욕', 3);
       expect(plan.destination, '뉴욕');
-      expect(plan.dayPlans.length, 3);
+      expect(plan.dayPlans.length, 4);
     });
 
     test('알 수 없는 목적지의 generic 플랜도 각 일차에 장소가 있다', () {

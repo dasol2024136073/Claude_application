@@ -72,9 +72,9 @@ void main() {
       expect(plan.destination, '파리');
     });
 
-    test('요청한 일수만큼만 dayPlans를 반환한다', () {
+    test('요청한 박수+1일치 dayPlans를 반환한다 (2박3일)', () {
       final plan = MockTripData.generate('도쿄', 2);
-      expect(plan.dayPlans.length, 2);
+      expect(plan.dayPlans.length, 3);
     });
 
     test('오사카 1일차에 장소가 4개다', () {
