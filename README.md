@@ -55,6 +55,16 @@ API 키(`lib/core/config.dart`) 등 자세한 설정은 [docs/setup.md](docs/set
 
 이 프로젝트는 AI Agent와 함께 작업합니다. 컨텍스트는 [AGENTS.md](AGENTS.md), 본인만의 운영 방법론은 [AUTHORING.임다솔.v0.4.0.md](AUTHORING.임다솔.v0.4.0.md) 참조.
 
+## 기획 문서
+
+| 문서 | 내용 |
+|------|------|
+| [기획서 · 비전](.planning/00-vision.md) | 앱 비전, 핵심 목표, 타깃 사용자 |
+| [요구사항](.planning/01-requirements.md) | 사용자 시나리오, MoSCoW 요구사항 |
+| [WBS · 일정](.planning/02-wbs.md) | 작업 분류 체계(WBS), 주차별 일정 |
+| [일정 계획](.planning/04-schedule.md) | 9주차~15주차 마일스톤 및 스프린트 계획 |
+| [아키텍처 결정 기록 (ADR)](.planning/decisions/) | ADR-0001 ~ ADR-0004 (프레임워크·상태관리·백엔드·저장소) |
+
 ## 라이선스
 
 본 프로젝트는 교육 목적의 기말 프로젝트입니다.
