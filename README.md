@@ -53,7 +53,14 @@ API 키(`lib/core/config.dart`) 등 자세한 설정은 [docs/setup.md](docs/set
 
 ## AI Agent 활용
 
-이 프로젝트는 AI Agent와 함께 작업합니다. 컨텍스트는 [AGENTS.md](AGENTS.md), 본인만의 운영 방법론은 [AUTHORING.임다솔.v0.4.0.md](AUTHORING.임다솔.v0.4.0.md) 참조.
+이 프로젝트는 기획·코드·문서 전 과정에 AI Agent(Claude Code)를 적극 활용했습니다.
+
+| 파일 | 내용 |
+|------|------|
+| [AGENTS.md](AGENTS.md) | AI Agent 컨텍스트 파일 (프로젝트 구조·규칙·명령어) |
+| [AUTHORING.임다솔.v0.5.0.md](AUTHORING.임다솔.v0.5.0.md) | 본인만의 AI Agent 운영 방법론 (agent/skills/rules/commands/workflow 통합, v0.1.0~v0.5.0) |
+| [notes/](notes/) | LLM Wiki — 주차별 암묵지 관리 (week10~week14, 프롬프트 패턴·실패 사례·개선 기록) |
+| [BONUS.md](BONUS.md) | 가산점 항목별 증거 자료 트래킹 |
 
 ## 기획 문서
 
